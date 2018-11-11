@@ -34,9 +34,11 @@ void etm();
 /*Functions*/
 int auth(char [], int);
 void startup();
+void rw();
 void WriteInFile();
 void failure();
 void getConfig();
+int DataCheck(int);
 
 /*Structs Part*/
 struct Data {
@@ -52,7 +54,7 @@ struct Data {
 };
 
 /*Globes Var*/
-int counter = 0, role = 0, maintain;
+int counter = 0, role = 0, rev_value = 0, maintain;
 char appear;
 char Normal[] = "Please enter the password", LIF[] = "Authorization Failure, Please try again.";
 
@@ -474,22 +476,61 @@ void emm() {
 };
 
 void etm() {
+    struct TMD {
+        int rid;
+        char ItemName[50];
+        int id;
+        char category[50];
+        int quantity;
+        double weight;
+        char recip[50];
+        char FinalDest[50];
+        char dev_stat[50];
+    }TMD ;
+
     system("title DANGER @ TEST Mode (ETM) Running");
-    char ch4;
+    char choice;
     ini();
     printf("'\n\t***  You have enter the Test Mode (ETM)  ***\n\n");
     printf("*Info: Beware to use Testmod, Error may occur if EMT is insert !\n");
-    printf("***   Shop Administration Panel   ***\n\n");
-    printf("Please Enter the options < 1 - 9 > : ");
-    scanf("%c", &ch4);
+    printf("***   Test Panel   ***\n\n");
+    printf("1. Additional Test");
+    printf("2. Display Test");
+    printf("3. Search Test");
+    printf("4. Removal Test");
+    printf("Please Enter the options < 1 - 4 > : ");
+    scanf("%c", &choice);
+    switch(choice) {
+        case 1:
+            rev_value = 1;
+            system("cls");
+            NEW_Record:
+            fflush(stdin);
+            printf("'\n\t***  You have enter the Test Mode (ETM) @ Additional Test  ***\n\n");
+            printf("Format: RID | ITN | ITID | CTG | Quantity | Weight | Recipient | Final Dest. | Devl. Stat.");
+            scanf("%d%s%d%s%d%lf%s%s%s", &TMD.rid, TMD.ItemName, &TMD.id, TMD.category, &TMD.quantity, &TMD.weight, TMD.recip, TMD.FinalDest, TMD.dev_stat);
+            fflush(stdin);
+
+    }
 };
 
 /*Functions*/
-void WriteInFile() {
-	
+int DataCheck(type) {
+    char TMD[10] = "testmode.dat", REL[10] = "stock.txt", TPI[10];
+    int return_value;
+    FILE *DCT = fopen(((type == 0) ? REL : TMD), "r");
+    if(fgets(TPI, sizeof(TPI), DCT) != NULL) {
+        return_value = 1;
+    }
+    return return_value;
 };
 
-void replace(char buf[]) {
+void WriteInFile(struct Data dataIO, int type) {
+    char TMD[10] = "testmode.dat", REL[10] = "stock.txt";
+    FILE *WriteIn = fopen(((type == 0) ? REL : TMD) );
+};
+
+void rw(char buf[]) {
 	int i, length;
 	length = strlen(buf);
 	for(i = 0; i < length + 1; i++) {
@@ -565,6 +606,16 @@ void startup() {
 	}
 	printf("\n System: (maintain.dat) Configuration Successful Loaded\n");
 	printf("\n System: (STU) Configuration Successful Loaded\n");
+    /*Check "testmode.dat"*/
+    FILE *start_tmd = fopen("maintain.dat", "r+");
+    if(start_tmd == NULL) {
+        start_tmd = fopen("maintain.dat", "a");
+        if(start_tmd == NULL) {
+            return failure();
+        }
+        fclose(start_tmd);
+    }
+    printf("\n System: (TMD) Configuration Successful Loaded\n");
 };
 
 void getConfig() {
