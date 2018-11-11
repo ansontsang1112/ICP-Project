@@ -19,4 +19,8 @@ Windows.h
 -
 Lmcons.h
 -
+unistd.h
+-
+dos.h
+-
 
