@@ -34,6 +34,8 @@ void emm();
 void etm();
 
 /*Functions*/
+int rid_gen();
+int id_gen();
 int auth(char [], int);
 void startup();
 void rw();
@@ -493,7 +495,7 @@ void etm() {
     scanf("%c", &choice);
     switch(choice) {
     	case 'A':
-        case 'a':
+        case 'a':       	
             rev_value = 1;
             system("cls");
             NEW_Record:
@@ -538,6 +540,20 @@ int DataCheck(int type) {
         return_value = 1;
     }
     return return_value;
+};
+
+int rid_gen() {
+	int rev_value = 0;
+    char str[1024];
+    FILE *display = fopen("rid.dat", "r");
+    while(fgets(str, sizeof(str), display)) {
+        rev_value = atoi(&str);              
+    }
+    fclose(display);
+}
+
+int id_gen() {
+	
 };
 
 void WriteInFile(struct Data dataIO, int type) {
