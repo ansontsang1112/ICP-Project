@@ -34,6 +34,7 @@ void emm();
 void etm();
 
 /*Functions*/
+int id_gen();
 int auth(char [], int);
 void startup();
 void rw();
@@ -56,7 +57,7 @@ struct Data {
 }Data ;
 
 /*Globes Var*/
-int counter = 0, role = 0, rev_value = 0, maintain;
+int counter = 0, role = 0, rev_value = 0, maintain, tmd;
 char appear;
 char Normal[] = "Please enter the password", LIF[] = "Authorization Failure, Please try again.";
 
@@ -124,7 +125,7 @@ void menu() {
 };
 
 int main() {
-	menu();
+	etm();
 }
 
 //Auth. System
@@ -194,6 +195,7 @@ void CustomerAuth() {
 
 /*Customer Panel & System / Shop Admin. Menu*/
 void SysAdm() {
+	system("cls");
     int ch2;
     ini();
     counter = 0;
@@ -248,6 +250,7 @@ void SysAdm() {
 };
 
 void ShopAdm() {
+	system("cls");
     int ch2;
     ini();
     counter = 0;
@@ -478,34 +481,47 @@ void emm() {
 };
 
 void etm() {
+	FILE *IDT = fopen("id_tm.dat", "r+");
+    if(IDT == NULL) {
+        IDT = fopen("id_tm.dat", "a");
+        if(IDT == NULL) {
+            return failure();
+        }
+        putw(1000, IDT);
+        fclose(IDT);
+    }
+	tmd = 1;
     system("title DANGER @ TEST Mode (ETM) Running");
     fflush(stdin);
     char choice;
     ini();
-    printf("\n\t\t\t\t\t***  You have enter the Test Mode (ETM)  ***\n\n");
+    printf("\t\t\t\t\t***  You have enter the Test Mode (ETM)  ***\n\n");
     printf(">>> Info: Beware to use Testmod, Error may occur if EMT is insert !\n");
-    printf("\t\n***   Test Panel   ***\n\n");
-    printf("\na. Additional Test\n");
-    printf("\nd. Display Test\n");
-    printf("\ns. Search Test\n");
-    printf("\nr. Removal Test\n");
-    printf("\nPlease Enter the options < a / d / s / r > : ");
+    printf("\t\n***   Test Panel   ***\n");
+    printf("\na. Additional Test");
+    printf("\nd. Display Test");
+    printf("\ns. Search Test");
+    printf("\nm. Removal Test");
+    printf("\nr. Reset Data in Test Mode Docs.");
+    printf("\ne. Exit in Test Mode.\n");
+    printf("\nPlease Enter the options < a / d / s / m / r / e > : ");
     scanf("%c", &choice);
     switch(choice) {
     	case 'A':
-        case 'a':
+        case 'a':       	
             rev_value = 1;
             system("cls");
             NEW_Record:
             fflush(stdin);
-            printf("'\n\t***  You have enter the Test Mode (ETM) @ Additional Test  ***\n\n");
+            printf("\n>> You have enter the Test Mode (ETM) @ Additional Test\n\n");
             printf("Record ID, Item ID will be Auto generated.\n");
-            printf("\nFormat: RID | ITN | ITID | CTG | Quantity | Weight | Recipient | Final Dest. | Devl. Stat.\n");
-            scanf("%d%s%d%s%d%lf%s%s%s", &Data.rid, Data.ItemName, &Data.id, Data.category, &Data.quantity, &Data.weight, Data.recip, Data.FinalDest, Data.dev_stat);
+            printf("\nFormat: Item Name | CTG | Quantity | Weight | Recipient | Final Dest. | Devl. Stat.\n");
+            printf("Please Enter The Record Data : ");
+            scanf("%s%s%d%lf%s%s%s", Data.ItemName, Data.category, &Data.quantity, &Data.weight, Data.recip, Data.FinalDest, Data.dev_stat);
             fflush(stdin);
             WriteInFile(Data);
             char choice;
-            printf("\nWould you like to input another data? (Y / N ) : ");
+            printf("\nWould you like to input another data? ( Y / N ) : ");
             scanf("%c", &choice);
             if(choice == 'y' || choice == 'Y') {
                goto NEW_Record;
@@ -526,6 +542,15 @@ void etm() {
                 printf("%s", str);              
             }
             fclose(display);
+            
+            
+        case 'E':
+        case 'e':
+            printf("\nYou will leave test mode very soon ...\n");
+            sleep(2);
+            printf("\nSaving your test mode result ...\n");
+            sleep(3);
+            return SysAdm();            		
     }
 };
 
@@ -541,30 +566,43 @@ int DataCheck(int type) {
 };
 
 void WriteInFile(struct Data dataIO, int type) {
-    char TMD[20] = "testmode.dat", REL[20] = "stock.txt", blank = ' ';
+    char TMD[20] = "testmode.dat", REL[20] = "stock.txt", IDT[20] = "id_tm.dat", IDR[20] = "id.dat";
     int dc = (type == 0) ? 0 : 1;
-
+    int max = 1000, min = 1, value = 0;
+	int id = rand() % ( max - min + 1 ) + min;
+	
     /*Replace '_' / '@' / '-' to ' '*/
     rw(Data.ItemName);
     rw(Data.recip);
     rw(Data.FinalDest);
     rw(Data.FinalDest);
     FILE *WriteIn = fopen(((type == 0) ? REL : TMD), (((DataCheck(dc) == 0) ? "w+" : "a+")));
-
-    /*WriteIn Started*/
-    fprintf(WriteIn, "---Start of Record (%d)---", Data.rid);
-    fprintf(WriteIn, "Record ID: %d\n", Data.rid);
+    
+    /*ID Get F(x)*/
+    FILE *IDRE = fopen((tmd == 0) ? IDR : IDT, "r");
+    value = getw(IDRE);    
+    
+    /* ---- WriteIn Started ----*/
+    fprintf(WriteIn, "---Start of Record (%d)---\n", value);
+    fprintf(WriteIn, "Record ID: %d\n", value);
     fprintf(WriteIn, "Item Name: %s\n", Data.ItemName);
-    fprintf(WriteIn, "Item ID: %d\n", Data.id);
+    fprintf(WriteIn, "Item ID: %d\n", id);
     fprintf(WriteIn, "Catagory: %d\n", Data.category);
     fprintf(WriteIn, "Quantity: %d\n", Data.quantity);
     fprintf(WriteIn, "Weight: %.3lf Kg\n", Data.weight);
     fprintf(WriteIn, "Recipient: %s\n", Data.recip);
     fprintf(WriteIn, "Final Destination: %s\n", Data.FinalDest);
     fprintf(WriteIn, "Delivery Status: %s\n", Data.dev_stat);
-    fprintf(WriteIn, "--- End of Record (%d)---", Data.rid);
-    
+    fprintf(WriteIn, "--- End of Record (%d)---\n", value);      
     fclose(WriteIn);
+    
+    FILE *ID = fopen((tmd == 0) ? IDR : IDT, "r");
+    value = getw(ID);
+    fclose(ID);
+    FILE *IDW = fopen((tmd == 0) ? IDR : IDT, "w");
+    value++;
+    putw(value, IDW);
+	fclose(IDW);
 };
 
 void rw(char buf[]) {
@@ -658,29 +696,30 @@ void startup() {
     }
     printf("\n System: (TMD) Configuration Successful Loaded\n");
     
-    /*Check "/system/id.dat & rid.dat"*/
-	FILE *start_id = fopen("id.dat", "r+");
-	if(start_id == NULL) {
-		start_id = fopen("id.dat", "w");
-		if(start_id == NULL) {
-			return failure();
-		}
-		fprintf(start_id, "1000");
-		fclose(start_id);
-	} 
-    printf("\n System: (IDMX) Configuration Successful Loaded\n");
-    
-    FILE *start_rid = fopen("rid.dat", "r+");
-    if(start_rid == NULL) {
-        start_rid = fopen("rid.dat", "a");
-        if(start_rid == NULL) {
+    /*Check "id.dat & id_tm.dat"*/
+    FILE *IDR = fopen("id.dat", "r+");
+    if(IDR == NULL) {
+        IDR = fopen("id.dat", "a");
+        if(IDR == NULL) {
             return failure();
         }
-        fprintf(start_rid, "1000");
-        fclose(start_rid);
+        putw(1000, IDR);
+        fclose(IDR);
     }
-    printf("\n System: (RIDMX) Configuration Successful Loaded\n");
-};
+    printf("\n System: (IDR) Configuration Successful Loaded\n");
+    
+    FILE *IDT = fopen("id_tm.dat", "r+");
+    if(IDT == NULL) {
+        IDT = fopen("id_tm.dat", "a");
+        if(IDT == NULL) {
+            return failure();
+        }
+        putw(1000, IDT);
+        fclose(IDT);
+    }
+    printf("\n System: (IDT) Configuration Successful Loaded\n");
+}
+    
 
 void getConfig() {
 	/*"maintain.dat" Exports*/
@@ -694,9 +733,9 @@ void getConfig() {
 	} 
 	fclose(extract_mcg);
 	system("title HKUSPACE IMRS @ Initialising");
-	printf("\n The System are keep laoding, please wait ....... \n");
+	printf("\n The System are keep loading, please wait ....... \n");
 	sleep(5);
-	system("title HKUSPACE IMRS @ Sucessfully loaded");
+	system("title HKUSPACE IMRS @ Successfully loaded");
 	printf("\n Welcome to HKUSPACE Inventory Management and Record System (IMRS) \n");
 	sleep(4);
 	system("cls");	
@@ -710,6 +749,4 @@ void failure() {
 	printf("To prevent further System Error, exit mode in 5 seconds.\n");
 	sleep(5);
 	exit(0);
-}
-
-
+};
