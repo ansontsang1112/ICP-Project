@@ -6,6 +6,8 @@
 #include <Lmcons.h> //Username Library
 #include <unistd.h>
 #include <dos.h>
+#include <dirent.h>
+#include <errno.h>
 
 /*Function Proto Type*/
 /*Menu GUI(s)*/
@@ -51,7 +53,7 @@ struct Data {
     char recip[50];
     char FinalDest[50];
     char dev_stat[50];
-};
+}Data ;
 
 /*Globes Var*/
 int counter = 0, role = 0, rev_value = 0, maintain;
@@ -476,47 +478,60 @@ void emm() {
 };
 
 void etm() {
-    struct TMD {
-        int rid;
-        char ItemName[50];
-        int id;
-        char category[50];
-        int quantity;
-        double weight;
-        char recip[50];
-        char FinalDest[50];
-        char dev_stat[50];
-    }TMD ;
-
     system("title DANGER @ TEST Mode (ETM) Running");
+    fflush(stdin);
     char choice;
     ini();
-    printf("'\n\t***  You have enter the Test Mode (ETM)  ***\n\n");
-    printf("*Info: Beware to use Testmod, Error may occur if EMT is insert !\n");
-    printf("***   Test Panel   ***\n\n");
-    printf("1. Additional Test");
-    printf("2. Display Test");
-    printf("3. Search Test");
-    printf("4. Removal Test");
-    printf("Please Enter the options < 1 - 4 > : ");
+    printf("\n\t\t\t\t\t***  You have enter the Test Mode (ETM)  ***\n\n");
+    printf(">>> Info: Beware to use Testmod, Error may occur if EMT is insert !\n");
+    printf("\t\n***   Test Panel   ***\n\n");
+    printf("\na. Additional Test\n");
+    printf("\nd. Display Test\n");
+    printf("\ns. Search Test\n");
+    printf("\nr. Removal Test\n");
+    printf("\nPlease Enter the options < a / d / s / r > : ");
     scanf("%c", &choice);
     switch(choice) {
-        case 1:
+    	case 'A':
+        case 'a':
             rev_value = 1;
             system("cls");
             NEW_Record:
             fflush(stdin);
             printf("'\n\t***  You have enter the Test Mode (ETM) @ Additional Test  ***\n\n");
-            printf("Format: RID | ITN | ITID | CTG | Quantity | Weight | Recipient | Final Dest. | Devl. Stat.");
-            scanf("%d%s%d%s%d%lf%s%s%s", &TMD.rid, TMD.ItemName, &TMD.id, TMD.category, &TMD.quantity, &TMD.weight, TMD.recip, TMD.FinalDest, TMD.dev_stat);
+            printf("Record ID, Item ID will be Auto generated.\n");
+            printf("\nFormat: RID | ITN | ITID | CTG | Quantity | Weight | Recipient | Final Dest. | Devl. Stat.\n");
+            scanf("%d%s%d%s%d%lf%s%s%s", &Data.rid, Data.ItemName, &Data.id, Data.category, &Data.quantity, &Data.weight, Data.recip, Data.FinalDest, Data.dev_stat);
             fflush(stdin);
-
+            WriteInFile(Data);
+            char choice;
+            printf("\nWould you like to input another data? (Y / N ) : ");
+            scanf("%c", &choice);
+            if(choice == 'y' || choice == 'Y') {
+               goto NEW_Record;
+            } else {
+                printf("\nYour Record are writing to file, please wait ...");
+                sleep(3);
+                system("cls");
+                return etm();
+            }
+        case 'D':
+        case 'd':
+            rev_value = 1;
+            char str[1024];
+            system("cls");
+            printf("'\n\t***  You have enter the Test Mode (ETM) @ Display Test  ***\n\n");
+            FILE *display = fopen("testmode.dat", "r");
+            while(fgets(str, sizeof(str), display)) {
+                printf("%s", str);              
+            }
+            fclose(display);
     }
 };
 
 /*Functions*/
-int DataCheck(type) {
-    char TMD[10] = "testmode.dat", REL[10] = "stock.txt", TPI[10];
+int DataCheck(int type) {
+    char TMD[20] = "testmode.dat", REL[20] = "stock.txt", TPI[20];
     int return_value;
     FILE *DCT = fopen(((type == 0) ? REL : TMD), "r");
     if(fgets(TPI, sizeof(TPI), DCT) != NULL) {
@@ -526,8 +541,30 @@ int DataCheck(type) {
 };
 
 void WriteInFile(struct Data dataIO, int type) {
-    char TMD[10] = "testmode.dat", REL[10] = "stock.txt";
-    FILE *WriteIn = fopen(((type == 0) ? REL : TMD) );
+    char TMD[20] = "testmode.dat", REL[20] = "stock.txt", blank = ' ';
+    int dc = (type == 0) ? 0 : 1;
+
+    /*Replace '_' / '@' / '-' to ' '*/
+    rw(Data.ItemName);
+    rw(Data.recip);
+    rw(Data.FinalDest);
+    rw(Data.FinalDest);
+    FILE *WriteIn = fopen(((type == 0) ? REL : TMD), (((DataCheck(dc) == 0) ? "w+" : "a+")));
+
+    /*WriteIn Started*/
+    fprintf(WriteIn, "---Start of Record (%d)---", Data.rid);
+    fprintf(WriteIn, "Record ID: %d\n", Data.rid);
+    fprintf(WriteIn, "Item Name: %s\n", Data.ItemName);
+    fprintf(WriteIn, "Item ID: %d\n", Data.id);
+    fprintf(WriteIn, "Catagory: %d\n", Data.category);
+    fprintf(WriteIn, "Quantity: %d\n", Data.quantity);
+    fprintf(WriteIn, "Weight: %.3lf Kg\n", Data.weight);
+    fprintf(WriteIn, "Recipient: %s\n", Data.recip);
+    fprintf(WriteIn, "Final Destination: %s\n", Data.FinalDest);
+    fprintf(WriteIn, "Delivery Status: %s\n", Data.dev_stat);
+    fprintf(WriteIn, "--- End of Record (%d)---", Data.rid);
+    
+    fclose(WriteIn);
 };
 
 void rw(char buf[]) {
@@ -571,6 +608,7 @@ void startup() {
 		fclose(start_pwd);
 	} 
 	printf("\n System: (pwd.dat) Configuration Successful Loaded\n");
+	
 	/*Check "spwd.dat"*/
 	FILE *start_spwd;
 	start_pwd = fopen("spwd.dat", "r+");
@@ -583,6 +621,7 @@ void startup() {
 		fclose(start_spwd);
 	} 
 	printf("\n System: (spwd.dat) Configuration Successful Loaded\n");
+	
 	/*Check "stock.txt"*/
 	FILE *start_stock;
 	start_stock = fopen("stock.txt", "r+");
@@ -593,6 +632,7 @@ void startup() {
 		}
 		fclose(start_stock);
 	}
+	
 	/*Check "maintain.dat"*/
 	FILE *start_config_mat;
 	start_config_mat = fopen("maintain.dat", "r+");
@@ -606,6 +646,7 @@ void startup() {
 	}
 	printf("\n System: (maintain.dat) Configuration Successful Loaded\n");
 	printf("\n System: (STU) Configuration Successful Loaded\n");
+	
     /*Check "testmode.dat"*/
     FILE *start_tmd = fopen("maintain.dat", "r+");
     if(start_tmd == NULL) {
@@ -616,6 +657,29 @@ void startup() {
         fclose(start_tmd);
     }
     printf("\n System: (TMD) Configuration Successful Loaded\n");
+    
+    /*Check "/system/id.dat & rid.dat"*/
+	FILE *start_id = fopen("id.dat", "r+");
+	if(start_id == NULL) {
+		start_id = fopen("id.dat", "w");
+		if(start_id == NULL) {
+			return failure();
+		}
+		fprintf(start_id, "1000");
+		fclose(start_id);
+	} 
+    printf("\n System: (IDMX) Configuration Successful Loaded\n");
+    
+    FILE *start_rid = fopen("rid.dat", "r+");
+    if(start_rid == NULL) {
+        start_rid = fopen("rid.dat", "a");
+        if(start_rid == NULL) {
+            return failure();
+        }
+        fprintf(start_rid, "1000");
+        fclose(start_rid);
+    }
+    printf("\n System: (RIDMX) Configuration Successful Loaded\n");
 };
 
 void getConfig() {
