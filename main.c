@@ -34,6 +34,10 @@ void emm();
 void etm();
 
 /*Functions*/
+<<<<<<< HEAD
+=======
+int rid_gen();
+>>>>>>> 38897e56b0a3da21c64b6f3235f000e23cd90e37
 int id_gen();
 int auth(char [], int);
 void startup();
@@ -563,6 +567,20 @@ int DataCheck(int type) {
         return_value = 1;
     }
     return return_value;
+};
+
+int rid_gen() {
+	int rev_value = 0;
+    char str[1024];
+    FILE *display = fopen("rid.dat", "r");
+    while(fgets(str, sizeof(str), display)) {
+        rev_value = atoi(&str);              
+    }
+    fclose(display);
+}
+
+int id_gen() {
+	
 };
 
 void WriteInFile(struct Data dataIO, int type) {
