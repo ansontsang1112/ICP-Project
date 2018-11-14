@@ -733,10 +733,7 @@ void interface(){
 	printf("");
 	printf("");
 	printf("");
-}
-
-
-
+};
 
 void getConfig() {
 	/*"maintain.dat" Exports*/
