@@ -725,14 +725,21 @@ void startup() {
 }
     
 void interface(){
-	printf("W            W  E E E E E  L           C C C C                 ");
-	printf(" W          W   E          L         C        ");
-	printf("  W   W    W    E E E E E  L         C                   ");
-	printf("   W W  W W     E          L         C               ");
-	printf("    W    W      E E E E E  L L L L L   C                                    ");
+	printf("W            W  E E E E E  L           C C C C  M       M E E E E E          ");
+	printf(" W          W   E          L         C          M M   M M E                ");
+	printf("  W   W    W    E E E E E  L         C          M   M   M E E E E E                 ");
+	printf("   W W  W W     E          L         C          M       M E             ");
+	printf("    W    W      E E E E E  L L L L L   C C C C  M       M E E E E E                              ");
 	printf("");
 	printf("");
 	printf("");
+	printf("");
+	printf("");
+	printf("");
+	printf("");
+	printf("");
+	printf("");
+	
 };
 
 void getConfig() {
