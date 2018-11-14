@@ -61,9 +61,9 @@ char appear;
 char Normal[] = "Please enter the password", LIF[] = "Authorization Failure, Please try again.";
 
 void ini() {
-    printf("\t\t\t***   Welcome to HKUSPACE Inventory Management and Record System   ***\n\n");
-    printf("\t\t\t\t\t\t***    1819S1    ***\n\n");
-    printf("\t\t\t*** This system is developed by CCIT4020 Class No. ?L-?? Group No,?? ***\n\n\n");
+    printf("\t***   Welcome to HKUSPACE Inventory Management and Record System   ***\n\n");
+    printf("\t\t***    1819S1    ***\n\n");
+    printf("\t*** This system is developed by CCIT4020 Class No. ?L-?? Group No,?? ***\n\n\n");
 }
 
 void menu() {
@@ -72,7 +72,7 @@ void menu() {
 	system("title HKUSPACE IMRS @ MENU CLI (ROLE)");
     char ch1 = 'C';
     /*Check IS Maintain Mode enabled ?*/
-    FILE *maintain = fopen("maintain.dat", "r");
+    FILE *maintain = fopen("system\\maintain.dat", "r");
     char coden = fgetc(maintain);
     if(atoi(&coden) == 1) {
     	ini();
@@ -427,7 +427,7 @@ void emm() {
     system("title Note @ Maintain Mode (EMM) Selecting");
     char choice = 'N', mc;
     int index = 1, rev_index = 0;
-    FILE *extract_mc = fopen("maintain.dat", "r");
+    FILE *extract_mc = fopen("system\\maintain.dat", "r");
     mc = fgetc(extract_mc);
     ini();
     if(atoi(&mc) == 0) {
@@ -437,7 +437,7 @@ void emm() {
             case 'Y':
             case 'y':
                 system("title Note @ Maintain Mode (EMM) Enabling");
-                FILE *maintain = fopen("maintain.dat", "w");
+                FILE *maintain = fopen("system\\maintain.dat", "w");
                 fprintf(maintain, "%d", index);
                 fclose(maintain);
                 printf("\nMaintain Mode is Successfully enabled. To prevent error in IRMS, the program will auto restart in 5 seconds.");
@@ -461,7 +461,7 @@ void emm() {
             case 'Y':
             case 'y':
                 system("title Note @ Maintain Mode (EMM) disabling");
-                FILE *maintain = fopen("maintain.dat", "w");
+                FILE *maintain = fopen("system\\maintain.dat", "w");
                 fprintf(maintain, "%d", rev_index);
                 fclose(maintain);
                 printf("\nMaintain Mode is Successfully disabled. To prevent error in IRMS, the program will auto restart in 5 seconds.");
@@ -480,9 +480,9 @@ void emm() {
 };
 
 void etm() {
-	FILE *IDT = fopen("id_tm.dat", "r+");
+	FILE *IDT = fopen("testmode\\id_tm.dat", "r+");
     if(IDT == NULL) {
-        IDT = fopen("id_tm.dat", "a");
+        IDT = fopen("testmode\\id_tm.dat", "a");
         if(IDT == NULL) {
             return failure();
         }
@@ -536,7 +536,7 @@ void etm() {
             char str[1024];
             system("cls");
             printf("'\n\t***  You have enter the Test Mode (ETM) @ Display Test  ***\n\n");
-            FILE *display = fopen("testmode.dat", "r");
+            FILE *display = fopen("testmode\\testmode.dat", "r");
             while(fgets(str, sizeof(str), display)) {
                 printf("%s", str);              
             }
@@ -555,7 +555,7 @@ void etm() {
 
 /*Functions*/
 int DataCheck(int type) {
-    char TMD[20] = "testmode.dat", REL[20] = "stock.txt", TPI[20];
+    char TMD[20] = "testmode\\testmode.dat", REL[20] = "stock.txt", TPI[20];
     int return_value;
     FILE *DCT = fopen(((type == 0) ? REL : TMD), "r");
     if(fgets(TPI, sizeof(TPI), DCT) != NULL) {
@@ -569,10 +569,9 @@ int id_gen() {
 };
 
 void WriteInFile(struct Data dataIO, int type) {
-    char TMD[20] = "testmode.dat", REL[20] = "stock.txt", IDT[20] = "id_tm.dat", IDR[20] = "id.dat";
+    char TMD[20] = "testmode\\testmode.dat", REL[20] = "stock.txt", IDT[20] = "testmode\\id_tm.dat", IDR[20] = "id.dat";
     int dc = (type == 0) ? 0 : 1;
     int max = 1000, min = 1, value = 0;
-	int id = rand() % ( max - min + 1 ) + min;
 	
     /*Replace '_' / '@' / '-' to ' '*/
     rw(Data.ItemName);
@@ -589,7 +588,7 @@ void WriteInFile(struct Data dataIO, int type) {
     fprintf(WriteIn, "---Start of Record (%d)---\n", value);
     fprintf(WriteIn, "Record ID: %d\n", value);
     fprintf(WriteIn, "Item Name: %s\n", Data.ItemName);
-    fprintf(WriteIn, "Item ID: %d\n", id);
+    fprintf(WriteIn, "Item ID: %d\n", value);
     fprintf(WriteIn, "Catagory: %d\n", Data.category);
     fprintf(WriteIn, "Quantity: %d\n", Data.quantity);
     fprintf(WriteIn, "Weight: %.3lf Kg\n", Data.weight);
@@ -676,9 +675,9 @@ void startup() {
 	
 	/*Check "maintain.dat"*/
 	FILE *start_config_mat;
-	start_config_mat = fopen("maintain.dat", "r+");
+	start_config_mat = fopen("system\\maintain.dat", "r+");
 	if(start_config_mat == NULL) {
-		start_config_mat = fopen("maintain.dat", "a");
+		start_config_mat = fopen("system\\maintain.dat", "a");
 		if(start_config_mat == NULL) {
 			return failure();
 		}
@@ -689,9 +688,9 @@ void startup() {
 	printf("\n System: (STU) Configuration Successful Loaded\n");
 	
     /*Check "testmode.dat"*/
-    FILE *start_tmd = fopen("maintain.dat", "r+");
+    FILE *start_tmd = fopen("testmode\\testmode.dat", "r+");
     if(start_tmd == NULL) {
-        start_tmd = fopen("maintain.dat", "a");
+        start_tmd = fopen("testmode\\testmode.dat", "a");
         if(start_tmd == NULL) {
             return failure();
         }
@@ -711,9 +710,9 @@ void startup() {
     }
     printf("\n System: (IDR) Configuration Successful Loaded\n");
     
-    FILE *IDT = fopen("id_tm.dat", "r+");
+    FILE *IDT = fopen("testmode\\id_tm.dat", "r+");
     if(IDT == NULL) {
-        IDT = fopen("id_tm.dat", "a");
+        IDT = fopen("testmode\\id_tm.dat", "a");
         if(IDT == NULL) {
             return failure();
         }
@@ -726,7 +725,7 @@ void startup() {
 
 void getConfig() {
 	/*"maintain.dat" Exports*/
-	char file_name[256] = "maintain.dat", mt_confg[2];
+	char file_name[256] = "system\\maintain.dat", mt_confg[2];
 	FILE *extract_mcg = fopen(file_name, "r");
 	if(extract_mcg != NULL) {
 		while (fgets(mt_confg, sizeof(mt_confg), extract_mcg) != NULL) {
@@ -736,7 +735,7 @@ void getConfig() {
 	} 
 	fclose(extract_mcg);
 	system("title HKUSPACE IMRS @ Initialising");
-	printf("\n The System are keep loading, please wait ....... \n");
+	printf("\n The System are keep loading, please wait .... \n");
 	sleep(5);
 	system("title HKUSPACE IMRS @ Successfully loaded");
 	printf("\n Welcome to HKUSPACE Inventory Management and Record System (IMRS) \n");
