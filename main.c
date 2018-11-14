@@ -564,10 +564,6 @@ int DataCheck(int type) {
     return return_value;
 };
 
-int id_gen() {
-	
-};
-
 void WriteInFile(struct Data dataIO, int type) {
     char TMD[20] = "testmode\\testmode.dat", REL[20] = "stock.txt", IDT[20] = "testmode\\id_tm.dat", IDR[20] = "id.dat";
     int dc = (type == 0) ? 0 : 1;
