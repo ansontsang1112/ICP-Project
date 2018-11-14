@@ -19,6 +19,7 @@ void ShopAuth();
 void ShopAdm();
 void CustomerAuth();
 void CustomerPanel();
+void interface();
 
 /*Functions*/
 void addition();
@@ -67,6 +68,7 @@ void ini() {
 }
 
 void menu() {
+	interface();
 	startup();
 	getConfig();
 	system("title HKUSPACE IMRS @ MENU CLI (ROLE)");
@@ -722,6 +724,19 @@ void startup() {
     printf("\n System: (IDT) Configuration Successful Loaded\n");
 }
     
+void interface(){
+	printf("W            W  E E E E E  L           C C C C                 ");
+	printf(" W          W   E          L         C        ");
+	printf("  W   W    W    E E E E E  L         C                   ");
+	printf("   W W  W W     E          L         C               ");
+	printf("    W    W      E E E E E  L L L L L   C                                    ");
+	printf("");
+	printf("");
+	printf("");
+}
+
+
+
 
 void getConfig() {
 	/*"maintain.dat" Exports*/
@@ -738,7 +753,6 @@ void getConfig() {
 	printf("\n The System are keep loading, please wait .... \n");
 	sleep(5);
 	system("title HKUSPACE IMRS @ Successfully loaded");
-	printf("\n Welcome to HKUSPACE Inventory Management and Record System (IMRS) \n");
 	sleep(4);
 	system("cls");	
 };
