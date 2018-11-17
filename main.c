@@ -8,6 +8,8 @@
 #include <dos.h>
 #include <dirent.h>
 #include <errno.h>
+#include <time.h>
+#inclyde <conio.h>
 
 /*Function Proto Type*/
 /*Menu GUI(s)*/
@@ -19,7 +21,7 @@ void ShopAuth();
 void ShopAdm();
 void CustomerAuth();
 void CustomerPanel();
-void ();
+void clearscr();
 
 /*Functions*/
 void addition();
@@ -737,13 +739,20 @@ void interface(){
 	printf("   T    O       O   O       O N  N  N L          I    N  N  N E E E E ");
 	printf("   T    O  	    O	O	    O N   N N L		     I	  N	  N	N E		  ");
 	printf("   T     O O O O     O O O O  N	    N L L L L I I I I N     N E E E E ");
-	printf("                                                                       ");
-	printf("                                                                       ");
-	printf("                                                                       ");
-	printf("                                                                       ");
-	printf("                                                                       ");
-	printf("                                                                       ");
-	
+	printf("\n")
+	printf(" S S S S  H       H  O O O O  P P P P  P P P P I I I I N     N  G G G G ");
+	printf("S         H       H O       0 P      P P      P   I    N N   N G        ");
+	printf(" S S S S  H H H H H 0       0 P P P P  P P P P    I    N  N  N G    G G ");
+	printf("        S H       H 0       0 P        P          I    N   N N G      G ");
+	printf(" S S S S  H       H  0 0 0 0  P        P       I I I I N     N  G G G G ");
+	printf("\n")
+	printf("P P P P  L          A    T T T T F F F F  O O O O  R R R R  M       M ");
+	printf("P      P L        A   A     T    F       O       O R      R M M   M M ");
+	printf("P P P P  L       A A A A    T    F F F F O       O R R R R  M   M   M ");
+	printf("P        L       A     A    T    F       O       O R    R   M       M ");
+	printf("P        L L L L A     A    T    F        O O O O  R      R M       M ");	
+	printf("                   Press <Enter> to continue...");
+	clrscr();
 };
 
 void getConfig() {
@@ -764,6 +773,15 @@ void getConfig() {
 	sleep(4);
 	system("cls");	
 };
+
+void clearscr(){
+	/* A function to clear screen within the user menu*/
+	
+}
+
+
+
+
 
 void failure() {
 	system("CLS");
