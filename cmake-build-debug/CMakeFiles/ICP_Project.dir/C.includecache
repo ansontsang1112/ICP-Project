@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-H:/Git_Sync/ICP Project/main.c
+H:/Sources_Code/ICP/main.c
 stdio.h
 -
 stdlib.h
@@ -22,5 +22,9 @@ Lmcons.h
 unistd.h
 -
 dos.h
+-
+dirent.h
+-
+errno.h
 -
 

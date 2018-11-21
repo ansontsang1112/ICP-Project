@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "H:/Git_Sync/ICP Project/main.c" "H:/Git_Sync/ICP Project/cmake-build-release/CMakeFiles/ICP_Project.dir/main.c.obj"
+  "H:/Sources_Code/ICP/main.c" "H:/Sources_Code/ICP/cmake-build-release/CMakeFiles/ICP_Project.dir/main.c.obj"
   )
 set(CMAKE_C_COMPILER_ID "GNU")
 

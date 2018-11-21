@@ -13,13 +13,14 @@
 /*Menu GUI(s)*/
 void ini();
 void menu();
-void SysAuth();
-void SysAdm();
-void ShopAuth();
-void ShopAdm();
-void CustomerAuth();
+void SysPanel();
+void SAPanel();
+void choices();
 void CustomerPanel();
-void ();
+
+/*User Login & Registation Functions*/
+void login();
+void reg();
 
 /*Functions*/
 void addition();
@@ -29,19 +30,20 @@ void modify();
 void del();
 
 /*Extra*/
-void csa();
-void csa2();
+void cpwd();
+void cperm();
 void emm();
 void etm();
 
 /*Functions*/
-int auth(char [], int);
+int auth(char [], char []);
 void startup();
 void rw();
 void WriteInFile();
 void failure();
 void getConfig();
 int DataCheck(int);
+void pret();
 
 /*Structs Part*/
 struct Data {
@@ -57,9 +59,10 @@ struct Data {
 }Data ;
 
 /*Globes Var*/
-int counter = 0, role = 0, rev_value = 0, maintain, tmd;
+int counter = 0, role = 0, rev_value = 0, maintain, tmd, permission;
 char appear;
 char Normal[] = "Please enter the password", LIF[] = "Authorization Failure, Please try again.";
+char username[50], password[50], money[20];
 
 void ini() {
     printf("\t***   Welcome to HKUSPACE Inventory Management and Record System   ***\n\n");
@@ -68,7 +71,6 @@ void ini() {
 }
 
 void menu() {
-	interface();
 	startup();
 	getConfig();
 	system("title HKUSPACE IMRS @ MENU CLI (ROLE)");
@@ -80,9 +82,9 @@ void menu() {
     	ini();
     	printf("Sorry, Mantain Mode is enabled, Only System Administrator are able to login to IMRS.\n\n");
     	printf("If you think this contain any Error, please contact the System Administrator. Sorry for inconvence.\n\n");
-    	printf("You will be redirect to System Administrator Identification Authorization Cneter.\n");
+    	printf("You will be redirect to MMD Identification Authorization Cneter.\n");
     	sleep(5);
-    	return SysAuth();
+    	return emm();
 	}
     
     /*Get Username
@@ -93,111 +95,103 @@ void menu() {
     /*printf(" ^v^ Welcome " << (TCHAR)Username << " use our IMRS, please select the options. ^v^\n\n");*/
     MENU:
     ini();
-	printf("~ <Please select the ROLE you are : > ~ \n\n");
-    printf(" A: System Administrator\n\n");
-    printf(" B: Shop Administrator\n\n");
-    printf(" C: Customer\n\n");
-    printf("**>> Please remind that you have the permission to login to relative sections. <<**\n\n");
-    printf("|| Please insert your Role option <A/B/C> || : ");
-    scanf("%c", &ch1);
-    switch (ch1) {
-        case 'A':
-        case 'a':
-            printf("\nYou have selected System Administrator Role, You will be redirect to Authorization pages. Please wait for 5 seconds\n");
-            system("timeout 5");
-            SysAuth();
-            break;
-        case 'B':
-        case 'b':
-            printf("\nYou have selected Shop Administrator Role, You will be redirect to Authorization pages. Please wait for 5 seconds\n");
-            system("timeout 5");
-            ShopAuth();
-            break;
-        case 'C':
-        case 'c':
-            printf("\nYou have selected Customer Role, You will be redirect to customer selection page.\n");
-            system("timeout 5");
-            CustomerAuth();
-            break;
-        default:
-            system("cls");
-            goto MENU;
-    }
+    char choice;
+	system("cls");
+	ini();
+	printf("\n>> Authorization Center, User Login / Logon System\n\n");
+	printf("a. Sign In (Already have User Account)\n");
+	printf("b. Sign Up (Do not have User Account)\n\n");
+	printf("Please Select < a / b > for Singn In / Sign Up : ");
+	fflush(stdin);
+	scanf("%c", &choice);
+	switch(choice) {
+		case 'a':
+		case 'A':
+			printf("\n\nYou have selected 'Sign In', You will be redirected to Sign in Session in few sec.");
+			sleep(3);
+			login();
+		case 'b':
+		case 'B':
+			printf("\n\nYou have selected 'Sign Up', You will be redirected to Registation Session in few sec.");
+			sleep(3);
+			reg();
+		default:
+			goto MENU;
+	}	
+	fflush(stdin);
+    
 };
 
+/*Main Function*/
 int main() {
-	menu();
+	login();
 }
 
 //Auth. System
-void SysAuth() {
+void login() {
 	system("cls");
-	char pw[20];
-	int cls = 0;		
-	role = 0;
-	system("CLS");
 	ini();
 	if(counter == 5) {
-		printf("You have type in the max. no of wrong password, the program will auto exit in 5 seconds.\n\n");
-        system("timeout 5");
-        exit(0);	
+		printf("You have type in the max. no. of wrong password, the program will auto exit in 5 seconds.\n\n");
+		sleep(5);
+		exit(0);
 	}
 	printf(">> Status : %s\n\n", (counter == 0) ? Normal : LIF);
 	/*UI Section*/
-	printf("***   System Administrator Authorization Page   ***\n\n");
-	printf("|Error Login Counter :  %d  times. You can try %d times\n\n", counter, 6 - counter);
-	/*System Administrtor Auth.*/
-	printf("Please type in the System Administrator's Password : ");
-	scanf("%s", &pw);
-	if(auth(pw, 0) == 0) {
-		printf("\nAuthorization Success, You will be redirect to System Menu in few seconds.\n");
-        sleep(3);
-        system("cls");
-        return SysAdm();
-	} else {
-        counter = counter + 1;
-        system("CLS");
-        return SysAuth();
-    }
-};
-
-void ShopAuth() {
-	system("cls");
-	char pw[20];		
-	system("CLS");
-	ini();
-	if(counter == 5) {
-		printf("You have type in the max. no of wrong password, the program will auto exit in 5 seconds.\n\n");
-        system("timeout 5");
-        exit(0);	
+	printf("***    User Login System - Authorization Page     ***\n\n");
+	printf(">> Error Login Counter : %d times. You can try %d times\n\n", counter, 6 - counter);
+	/*Auth. Center*/
+	fflush(stdin);
+	printf("You are on LOG-IN Mode, Please enter your account & password !");
+	printf("\n\nUsername : ");
+	scanf("%s", username);
+	printf("\nPassword : ");
+	scanf("%s", password);
+	if(auth(username, password) != 0) {
+		printf("\nAuthorization Failure, Please wait for 3 sec. to return LOG-IN Platform.");
+		counter++;
+		sleep(3);
+		return login();
 	}
-	printf(">> Status : %s\n\n", (counter == 0) ? Normal : LIF);
-	/*UI Section*/
-	printf("***   Shop Administrator Authorization Page   ***\n\n");
-	printf("|Error Login Counter :  %d  times. You can try %d times\n\n", counter, 6 - counter);
-	/*System Administrtor Auth.*/
-	printf("Please type in the Shop Administrator's Password : ");
-	scanf("%s", &pw);
-	if(auth(pw, 1) == 0) {
-		printf("\nAuthorization Success, You will be redirect to System Menu in few seconds.\n");
+	printf("\nAuthorization Success, Getting the Permissions from PSCF.\n");
+	sleep(1);
+	/*Get the permission*/
+	char path[] = "userdata\\", file[] = "\\permission.dat";
+	strcat(path, username);
+	strcat(path, file);
+	FILE *getPerm = fopen(path, "r+");
+	char coden = fgetc(getPerm);
+	permission = atoi(&coden);
+	fclose(getPerm);
+	if(permission == 0) {
+	    printf("\nYou are belongs to >> SYS. Admin. Redirecting to Relative GUI Panel ...\n");
+	    sleep(3);
+	    return SysPanel();
+	} if(permission == 1) {
+        printf("\nYou are belongs to >> SHOP Admin. Redirecting to Relative GUI Panel ...\n");
         sleep(3);
-        system("cls");
-        return ShopAdm();
+        return SAPanel();
+	} if(permission == 2) {
+	    printf("\nYou are belong to >> Customer. Redirecting to Relative GUI Panel ...");
+	    sleep(3);
+	    return CustomerPanel();
 	} else {
-        counter = counter + 1;
-        system("CLS");
-        return ShopAuth();
-    }
+	    printf("\nAn error occur. Auto-fixing ....\n");
+	    sleep(2);
+	    printf("\nFix FAILURE ... Redirecting\n");
+	    sleep(3);
+        return failure();
+	}
 };
 
-void CustomerAuth() {
-
+void reg() {
+	
 };
 
 /*Customer Panel & System / Shop Admin. Menu*/
-void SysAdm() {
+void SysPanel() {
 	system("cls");
-    int ch2;
+    int choice;
     ini();
     counter = 0;
     printf("***   Shop Administration Panel   ***\n\n");
@@ -207,52 +201,18 @@ void SysAdm() {
     printf(" 4. Modify Item Information<s>\n");
     printf(" 5. Delete Item Record<s>\n");
     printf("\n***   System Administration Panel   ***\n\n");
-    printf(" 6. Change System Administrator's Password\n");
-    printf(" 7. Change Shop Administrator's Password\n");
-    printf(" 8. Enable Maintain Mode\n");
-    printf(" 9. Enable Test Mode\n");
+    printf(" 6. Change Users Password\n");
+    printf(" 7. Change Permission of Specific Users\n");
+    printf(" 8. Enable / Disable Maintain Mode\n");
+    printf(" 9. Enable / Disable Test Mode\n");
     printf("\n What is your option <1-9> ? || ");
-    scanf("%d", &ch2);
-    switch (ch2) {
-        case 1:
-            role = 0;
-            break;
-        case 2:
-            display();
-            break;
-        case 3:
-            search();
-            break;
-        case 4:
-            modify();
-            break;
-        case 5:
-            del();
-            break;
-        case 6:
-            csa();
-            break;
-        case 7:
-            role = 0;
-            csa2();
-            break;
-        case 8:
-            emm();
-            break;
-        case 9:
-            etm();
-            break;
-        default:
-            printf("No this option < %d >, < 1 - 9 > Only.\n", ch2);
-            sleep(3);
-            system("cls");
-            return SysAdm();
-    }
+    scanf("%d", &choice);
+    choices(choice);
 };
 
-void ShopAdm() {
+void SAPanel() {
 	system("cls");
-    int ch2;
+    int choice;
     ini();
     counter = 0;
     printf("***   Shop Administration Panel   ***\n\n");
@@ -262,13 +222,20 @@ void ShopAdm() {
     printf(" 4. Modify Item Information<s>\n");
     printf(" 5. Delete Item Record<s>\n");
     printf("\n***   Administration Panel   ***\n\n");
-    printf(" 6. Change Shop Administrator's Password\n");
+    printf(" 6. Change Users Password\n");
     printf("\n What is your option <1-6> ? || ");
-    scanf("%d", &ch2);
-    switch (ch2) {
+    scanf("%d", &choice);
+    choices(choice);
+};
+
+void CustomerPanel() {
+
+};
+
+void choices(int type) {
+    switch (type) {
         case 1:
-            role = 1;
-            ;
+            addition();
             break;
         case 2:
             display();
@@ -283,22 +250,32 @@ void ShopAdm() {
             del();
             break;
         case 6:
-            role = 1;
-            csa2();
+        	counter == 0;
+            cpwd();
             break;
         case 7:
-            csa2();
+        	counter == 0;
+            cperm();
+            break;
+        case 8:
+            emm();
+            break;
+        case 9:
+            etm();
             break;
         default:
-            printf("No this option < %d >, < 1 - 6 > Only.\n", ch2);
+            printf("No this option < %d >, < 1 - 9 > Only.\n", type);
             sleep(3);
             system("cls");
-            return ShopAdm();
-    }
-};
-
-void CustomerPanel() {
-
+            /*0 = SYS / 1 = SHOP / 2 = Customer*/
+            if(permission == 0) {
+                return SysPanel();
+			} if(permission == 1) {
+                return SAPanel();
+            } if(permission == 2) {
+                return CustomerPanel();
+            }
+	}
 };
 
 
@@ -324,27 +301,29 @@ void del() {
 };
 
 /*Features (Extra)*/
-void csa() {
+void cpwd() {
 	system("cls");
 	ini();
-	char file[10], PW[10], NPWD[10], CNP[10];
-    if (counter > 5) {
-        printf("\nError attempts lager than 5.\n\n");
-        system("timeout 5");
+	char PW[10], NPWD[10], CNP[10];
+    if (counter == 5) {
+        printf("\nError attempts lager than 5. To prevent Unauthorised Access, Exit in 5 second!\n\n");
+        sleep(5);
         system("CLS");
-        return SysAdm();
+        exit(0);
     }
-    printf("\nYou have selected the option 6 : Change the Sys. Admin. Password.\n\n");
+    printf("\nYou have selected the option 6 : Change the Password.\n\n");
     printf("*** Identification Authorization System ***\n\n");
-    printf("Status : %s\n", (counter == 0) ? Normal : LIF);
-    printf("\nError Login Counter :  %d  times. You can try %d times\n\n", counter, 6 - counter);
-    printf("To prevent unknown edition of Sys. Admin. Password, PAUS established.\n\n");
-    printf("Please Enter the Old Administration Password: ");
+    printf(">> Status : %s\n", (counter == 0) ? Normal : LIF);
+    printf("\n>> Error Login Counter :  %d  times. You can try %d times\n\n", counter, 6 - counter);
+    printf("To prevent unknown edition of Password, PAUS established.\n\n");
+    printf("Please Enter the Old User Password: ");
+    fflush(stdin);
     scanf("%s", PW);
-    if(auth(PW, 0) == 0) {
+    if(auth(username, PW) == 0) {
     	printf("\n Authorization Sucess: \n\n");
     	PwTypo:
-    	printf("Please Enter the New Administration Password: ");
+    	printf("Please Enter the New Password: ");
+    	fflush(stdin);
     	scanf("%s", NPWD);
     	printf("\nPlease Enter it again: ");
     	scanf("%s", CNP);
@@ -352,76 +331,75 @@ void csa() {
     		ini();
     		printf("You are required to Enter Again.\n\n");
     		printf("Please wait in few second\n");  
-			sleep(5);
+			sleep(2);
 			system("cls");
+			fflush(stdin);
 			goto PwTypo;
 		}
 	} else {
 		counter += 1;
-		return csa();
+		return cpwd();
 	}
 	/*Write in "pwd.dat"*/
-	FILE *PWD = fopen("pwd.dat", "w");
+	char path[] = "userdata\\", pwdfile[] = "\\password.dat";
+	strcat(path, username);
+	strcat(path, pwdfile);
+	FILE *PWD = fopen(path, "w");
 	fprintf(PWD, "%s", NPWD);
 	fclose(PWD);
-	printf("\n Password Successfully Changed, Return in 5 seconds");
+	printf("\nPassword Successfully Changed, Return in 5 seconds");
 	sleep(5);
-	return SysAdm();
+	pret();
 };
 
-void csa2() {
-    char PW[10], NPWD[10], CNP[10];
+void cperm() {
+    char PERM[10], PW[20], IUN[20];
     system("cls");
     ini();
-    printf("***   Shop Administrator Authorization Page   ***\n\n");
-    /*System Administrator Parts*/
-    if(role == 0) {
-        printf("\nPlease enter the New Shop Administrator's Password : ");
-        scanf("%s", NPWD);
-        printf("\nPlease enter the New Shop Administrator's Password again : ");
-        scanf("%s", CNP);
-        if(strcmp(NPWD, CNP) != 0) {
-            return csa2();
-        }
-        goto WriteIn;
-    } else {
-        printf("\n** Identification Authorization Required **");
-        printf("\nStatus : %s\n", (counter == 0) ? Normal : LIF);
-        printf("\nError Counter: You still have %d chances for Error tries.\n", 6 - counter);
-        printf("\nTo prevent unknown edition of Shop Admin. Password, PAUS established.\n\n");
-        printf("\nPlease Enter the Old Shop Administration's Password: ");
-        scanf("%s", PW);
-        if(auth(PW, 1) == 0) {
-            printf("\n Authorization Success: \n\n");
-            STNP:
-            printf("Please enter the New Shop Administrator's Password : ");
-            scanf("%s", NPWD);
-            printf("\nPlease enter the New Shop Administrator's Password Again : ");
-            scanf("%s", CNP);
-            if(strcmp(NPWD, CNP) != 0) {
-                printf("\nYou are required to Enter Again.\n\n");
-                sleep(2);
-                goto STNP;
-            }
-            goto WriteIn;
-        }
-    }
-
-    WriteIn:
-    /*Write in "spwd.dat"*/
-    printf("");
-    FILE *SPWD = fopen("spwd.dat", "w");
-    fprintf(SPWD, "%s", NPWD);
-    fclose(SPWD);
-    printf("\n Password Successfully Changed, Return in 5 seconds");
-    sleep(5);
-    if(role == 0) {
-    	system("cls");
-    	return SysAdm();
-	} else {
-		system("cls");
-		return ShopAdm();
+    if(counter >= 5) {
+    	printf("Max. Error Attemp ... Exit in few sec.");
+    	sleep(3);
+    	exit(0);
 	}
+    printf("***   Authorization Session   ***\n\n");
+    printf("** Identification Required **\n");
+	printf("\n>> Status : %s\n", (counter == 0) ? Normal : LIF);
+    printf("\n>> Error Counter: You still have %d chances for Error tries.\n", 6 - counter);
+    printf("\nTo prevent unknown edition of permissions, PAUS established.\n\n");
+    printf("\nPlease Enter the authorised password : ");
+    scanf("%s", PW);
+    if(auth(username, password) != 0) {
+    	printf("\nIdentification FAILURE !! Please wait for few Seconds ...");
+    	sleep(3);
+    	counter++;
+    	return cperm();
+    }
+    printf("\nAuthorization Success ... Wait ...\n\n");
+	sleep(3);
+    STNP:
+    printf("Please enter the username that you want to change the permission : ");
+    scanf("%s", IUN);
+    char path[] = "userdata\\", permfile[] = "\\permission.dat";
+	strcat(path, username); 
+	strcat(path, permfile);
+    FILE *search = fopen(path, "r");
+    if(search == NULL) {
+      	printf("\nNo this User : %s", IUN);
+       	sleep(5);
+       	goto STNP;
+	} 
+	fclose(search);
+    printf("\nPlease enter the New permission for %s : ", username);
+    scanf("%s", PERM);
+
+    /*Write in "PERM"*/
+    printf("");
+    FILE *SPRM = fopen(path, "w");
+    fputs(PERM, SPRM);
+    fclose(SPRM);
+    printf("\n\nPermission Successfully Changed ... Please wait for 3 Second");
+    sleep(3);
+    pret();
 }
 
 void emm() {
@@ -451,7 +429,7 @@ void emm() {
             case 'N':
                 printf("\nYou have selected < N > in EMM. You will be return to Admin. Panel in few seconds.");
                 sleep(3);
-                return SysAdm();
+                return SysPanel();
                 break;
             default:
                 return emm();
@@ -551,13 +529,13 @@ void etm() {
             sleep(2);
             printf("\nSaving your test mode result ...\n");
             sleep(3);
-            return SysAdm();            		
+            return SysPanel();            		
     }
 };
 
 /*Functions*/
 int DataCheck(int type) {
-    char TMD[20] = "testmode\\testmode.dat", REL[20] = "stock.txt", TPI[20];
+    char TMD[50] = "testmode\\testmode.dat", REL[20] = "stock.txt", TPI[20];
     int return_value;
     FILE *DCT = fopen(((type == 0) ? REL : TMD), "r");
     if(fgets(TPI, sizeof(TPI), DCT) != NULL) {
@@ -566,12 +544,8 @@ int DataCheck(int type) {
     return return_value;
 };
 
-int id_gen() {
-	
-};
-
 void WriteInFile(struct Data dataIO, int type) {
-    char TMD[20] = "testmode\\testmode.dat", REL[20] = "stock.txt", IDT[20] = "testmode\\id_tm.dat", IDR[20] = "id.dat";
+    char TMD[50] = "testmode\\testmode.dat", REL[20] = "stock.txt", IDT[20] = "testmode\\id_tm.dat", IDR[20] = "id.dat";
     int dc = (type == 0) ? 0 : 1;
     int max = 1000, min = 1, value = 0;
 	
@@ -619,21 +593,45 @@ void rw(char buf[]) {
 	}
 }
 
-int auth(char pw[], int type) {
-	/*"pwd.dat / spwd.dat" Password Exports*/
-	char spwd[10] = "spwd.dat", pwd[10] = "pwd.dat", tmp[20];
-	int local_counter = 0, result = 0;
-	FILE *extract_pwd = fopen(((type != 0) ? spwd : pwd), "r");
-	
-	while(fgets(tmp, sizeof(tmp), extract_pwd) != NULL) {
-		local_counter++;
-		if(local_counter == 0) {
-			continue;
-		}
-	}
+int auth(char un[], char pw[]) {
+	/*Path declearation*/
+	char path_acc[] = "userdata\\", path_pw[] = "userdata\\", acc[] = "\\username.dat", pwd[] = "\\password.dat";
+	int c1 = 0, c2 = 0, r1 = 0, r2 = 0, result = -1;
+	char match_ac[50], match_pw[50];
+	/*Export Account*/
+	strcat(path_acc, un);
+	strcat(path_acc, acc);
+	FILE *extract_ac = fopen(path_acc, "r");
+	fgets(match_ac, sizeof(match_ac), extract_ac);
+	fclose(extract_ac);
+	/*Export Password*/
+	strcat(path_pw, un);
+	strcat(path_pw, pwd);
+	FILE *extract_pwd = fopen(path_pw, "r");
+	fgets(match_pw, sizeof(match_pw), extract_pwd);
 	fclose(extract_pwd);
-	result = strcmp(pw, tmp);
+	
+	r1 = strcmp(un, match_ac);
+	r2 = strcmp(pw, match_pw);
+	if(r1 == 0 && r2 == 0) {
+		result = 0;
+	} else {
+		result = 1;
+	}
+	
 	return result;
+}
+
+void pret() {
+	if(permission == 0) {
+		return SysPanel();
+	} if(permission == 1) {
+		return SAPanel();
+	} if(permission == 2) {
+		return CustomerPanel();
+	} else {
+	    return failure();
+	}
 }
 
 void startup() {
@@ -724,28 +722,6 @@ void startup() {
     printf("\n System: (IDT) Configuration Successful Loaded\n");
 }
     
-void interface(){
-	/* Welcome interface*/
-	printf("  W     W  E E E E   L         C C C C  O O O O  M       M E E E E ");
-	printf("  W     W  E         L        C        O       O M M   M M E       ");
-	printf("  W  W  W  E E E E   L        C        O       O M   M   M E E E E ");
-	printf("  W W W W  E         L        C        O       O M       M E       ");
-	printf("   W   W   E E E E   L L L L   C C C C  O O O O  M       M E E E E ");
-	printf("\n");
-	printf("T T T T  O O O O     O O O O  N     N L       I I I I N     N E E E E ");
-	printf("   T    O       O   O       O N N   N L          I    N N   N E       ");
-	printf("   T    O       O   O       O N  N  N L          I    N  N  N E E E E ");
-	printf("   T    O  	    O	O	    O N   N N L		     I	  N	  N	N E		  ");
-	printf("   T     O O O O     O O O O  N	    N L L L L I I I I N     N E E E E ");
-	printf("                                                                       ");
-	printf("                                                                       ");
-	printf("                                                                       ");
-	printf("                                                                       ");
-	printf("                                                                       ");
-	printf("                                                                       ");
-	
-};
-
 void getConfig() {
 	/*"maintain.dat" Exports*/
 	char file_name[256] = "system\\maintain.dat", mt_confg[2];
