@@ -8,6 +8,7 @@
 #include <dos.h>
 #include <dirent.h>
 #include <errno.h>
+#include <limits.h>
 
 /*Function Proto Type*/
 /*Menu GUI(s)*/
@@ -19,7 +20,6 @@ void choices();
 void CustomerPanel();
 
 /*User Login & Registation Functions*/
-void login();
 void reg();
 
 /*Functions*/
@@ -33,7 +33,6 @@ void del();
 void cpwd();
 void cperm();
 void emm();
-void etm();
 
 /*Functions*/
 int auth(char [], char []);
@@ -42,7 +41,7 @@ void rw();
 void WriteInFile();
 void failure();
 void getConfig();
-int DataCheck(int);
+int DataCheck();
 void pret();
 
 /*Structs Part*/
@@ -77,8 +76,8 @@ void menu() {
     char ch1 = 'C';
     /*Check IS Maintain Mode enabled ?*/
     FILE *maintain = fopen("system\\maintain.dat", "r");
-    char coden = fgetc(maintain);
-    if(atoi(&coden) == 1) {
+    char Mcoden = fgetc(maintain);
+    if(atoi(&Mcoden) == 1) {
     	ini();
     	printf("Sorry, Mantain Mode is enabled, Only System Administrator are able to login to IMRS.\n\n");
     	printf("If you think this contain any Error, please contact the System Administrator. Sorry for inconvence.\n\n");
@@ -94,43 +93,9 @@ void menu() {
     /*RSM Menu*/
     /*printf(" ^v^ Welcome " << (TCHAR)Username << " use our IMRS, please select the options. ^v^\n\n");*/
     MENU:
+    system("cls");
     ini();
     char choice;
-	system("cls");
-	ini();
-	printf("\n>> Authorization Center, User Login / Logon System\n\n");
-	printf("a. Sign In (Already have User Account)\n");
-	printf("b. Sign Up (Do not have User Account)\n\n");
-	printf("Please Select < a / b > for Singn In / Sign Up : ");
-	fflush(stdin);
-	scanf("%c", &choice);
-	switch(choice) {
-		case 'a':
-		case 'A':
-			printf("\n\nYou have selected 'Sign In', You will be redirected to Sign in Session in few sec.");
-			sleep(3);
-			login();
-		case 'b':
-		case 'B':
-			printf("\n\nYou have selected 'Sign Up', You will be redirected to Registation Session in few sec.");
-			sleep(3);
-			reg();
-		default:
-			goto MENU;
-	}	
-	fflush(stdin);
-    
-};
-
-/*Main Function*/
-int main() {
-	login();
-}
-
-//Auth. System
-void login() {
-	system("cls");
-	ini();
 	if(counter == 5) {
 		printf("You have type in the max. no. of wrong password, the program will auto exit in 5 seconds.\n\n");
 		sleep(5);
@@ -138,51 +103,61 @@ void login() {
 	}
 	printf(">> Status : %s\n\n", (counter == 0) ? Normal : LIF);
 	/*UI Section*/
-	printf("***    User Login System - Authorization Page     ***\n\n");
-	printf(">> Error Login Counter : %d times. You can try %d times\n\n", counter, 6 - counter);
+	printf("***    User Login Panel || Authorization System     ***\n\n");
+	printf(">> Error LOG-IN Counter : %d times. You can try %d times\n\n", counter, 6 - counter);
 	/*Auth. Center*/
 	fflush(stdin);
-	printf("You are on LOG-IN Mode, Please enter your account & password !");
+	printf("Please Enter your Username & Password. If you do not have an account, please enter 'REGISTER' to get an account.");
 	printf("\n\nUsername : ");
 	scanf("%s", username);
+	if(username == "REGISTER") {
+		return reg();
+	}
 	printf("\nPassword : ");
 	scanf("%s", password);
 	if(auth(username, password) != 0) {
 		printf("\nAuthorization Failure, Please wait for 3 sec. to return LOG-IN Platform.");
 		counter++;
 		sleep(3);
-		return login();
+		goto MENU;
 	}
 	printf("\nAuthorization Success, Getting the Permissions from PSCF.\n");
 	sleep(1);
+	
 	/*Get the permission*/
 	char path[] = "userdata\\", file[] = "\\permission.dat";
 	strcat(path, username);
 	strcat(path, file);
 	FILE *getPerm = fopen(path, "r+");
-	char coden = fgetc(getPerm);
-	permission = atoi(&coden);
+	char Pcoden = fgetc(getPerm);
+	permission = atoi(&Pcoden);
 	fclose(getPerm);
 	if(permission == 0) {
 	    printf("\nYou are belongs to >> SYS. Admin. Redirecting to Relative GUI Panel ...\n");
-	    sleep(3);
+	    sleep(2);
 	    return SysPanel();
 	} if(permission == 1) {
         printf("\nYou are belongs to >> SHOP Admin. Redirecting to Relative GUI Panel ...\n");
-        sleep(3);
+        sleep(2);
         return SAPanel();
 	} if(permission == 2) {
 	    printf("\nYou are belong to >> Customer. Redirecting to Relative GUI Panel ...");
-	    sleep(3);
+	    sleep(2);
 	    return CustomerPanel();
 	} else {
 	    printf("\nAn error occur. Auto-fixing ....\n");
 	    sleep(2);
 	    printf("\nFix FAILURE ... Redirecting\n");
-	    sleep(3);
+	    sleep(2);
         return failure();
-	}
+	}	
+	fflush(stdin);
 };
+
+/*Main Function*/
+int main() {
+	emm();
+}
 
 void reg() {
 	
@@ -200,12 +175,13 @@ void SysPanel() {
     printf(" 3. Search Item Information<s>\n");
     printf(" 4. Modify Item Information<s>\n");
     printf(" 5. Delete Item Record<s>\n");
-    printf("\n***   System Administration Panel   ***\n\n");
+    printf("\n***   System Administration & Slef Panel   ***\n\n");
     printf(" 6. Change Users Password\n");
     printf(" 7. Change Permission of Specific Users\n");
     printf(" 8. Enable / Disable Maintain Mode\n");
-    printf(" 9. Enable / Disable Test Mode\n");
-    printf("\n What is your option <1-9> ? || ");
+    printf(" 9. Enable Self Destruction Mode\n");
+    printf("10. Logout\n");
+    printf("\n What is your option <1-10> ? || ");
     scanf("%d", &choice);
     choices(choice);
 };
@@ -221,10 +197,17 @@ void SAPanel() {
     printf(" 3. Search Item Information<s>\n");
     printf(" 4. Modify Item Information<s>\n");
     printf(" 5. Delete Item Record<s>\n");
-    printf("\n***   Administration Panel   ***\n\n");
+    printf("\n***   Administration & Self Panel   ***\n\n");
     printf(" 6. Change Users Password\n");
-    printf("\n What is your option <1-6> ? || ");
+    printf("10. Logout\n");
+    printf("\n What is your option <1-6, 10 > ? || ");
+    fflush(stdin);
     scanf("%d", &choice);
+    if(choice > 6 && choice < 10) {
+    	printf("\nYou are only allow to enter 1 - 6 & 10, %d are not allowed !", choice);
+    	sleep(2);
+    	return SAPanel();
+	}
     choices(choice);
 };
 
@@ -261,10 +244,15 @@ void choices(int type) {
             emm();
             break;
         case 9:
-            etm();
             break;
+        case 10:
+        	printf("\nYou have selected Logout, Exiting Session ...\n");
+        	sleep(3);
+        	printf("\nThankyou for using HKUSPACE IMRS ^v^");
+        	sleep(2);
+        	exit(0);
         default:
-            printf("No this option < %d >, < 1 - 9 > Only.\n", type);
+            printf("No this option < %d >, < 1 - 10> Only.\n", type);
             sleep(3);
             system("cls");
             /*0 = SYS / 1 = SHOP / 2 = Customer*/
@@ -281,6 +269,28 @@ void choices(int type) {
 
 /*Features (Original)*/
 void addition() {
+    system("cls");
+    ini();
+    NEW_Record:
+    fflush(stdin);
+    printf("\n>> You have enter the Additional Mode\n\n");
+    printf("Record ID, Item ID will be Auto generated.\n");
+    printf("\nFormat: Item Name | Category | Quantity | Weight | Recipient | Final Dest. | Devl. Stat.\n");
+    printf("\nPlease Enter The Record Data : ");
+    scanf("%s%s%d%lf%s%s%s", Data.ItemName, Data.category, &Data.quantity, &Data.weight, Data.recip, Data.FinalDest, Data.dev_stat);
+    fflush(stdin);
+    WriteInFile(Data);
+    char choice;
+    printf("\nWould you like to enter another data? ( Y / N ) : ");
+    scanf("%c", &choice);
+    if(choice == 'y' || choice == 'Y') {
+        goto NEW_Record;
+    } else {
+        printf("\nYour Record are writing to file, please wait ...");
+        sleep(3);
+        system("cls");
+        return pret();
+    }
 
 };
 
@@ -368,28 +378,31 @@ void cperm() {
     printf("\nTo prevent unknown edition of permissions, PAUS established.\n\n");
     printf("\nPlease Enter the authorised password : ");
     scanf("%s", PW);
-    if(auth(username, password) != 0) {
+    if(auth(username, PW) != 0) {
     	printf("\nIdentification FAILURE !! Please wait for few Seconds ...");
     	sleep(3);
     	counter++;
     	return cperm();
     }
-    printf("\nAuthorization Success ... Wait ...\n\n");
+    printf("\nAuthorization Success ... Wait ...\n");
 	sleep(3);
     STNP:
-    printf("Please enter the username that you want to change the permission : ");
+    system("cls");
+    ini();
+    printf("\nPlease enter the username that you want to change the permission : ");
     scanf("%s", IUN);
-    char path[] = "userdata\\", permfile[] = "\\permission.dat";
-	strcat(path, username); 
+    char path[] = "userdata\\", permfile[] = "\\permission.dat", UN[10];
+    strcpy(UN, IUN);
+	strcat(path, IUN); 
 	strcat(path, permfile);
     FILE *search = fopen(path, "r");
     if(search == NULL) {
-      	printf("\nNo this User : %s", IUN);
+      	printf("\nNo this User : %s", UN);
        	sleep(5);
        	goto STNP;
 	} 
 	fclose(search);
-    printf("\nPlease enter the New permission for %s : ", username);
+    printf("\nPlease enter the New permission for %s : ", UN);
     scanf("%s", PERM);
 
     /*Write in "PERM"*/
@@ -435,7 +448,49 @@ void emm() {
                 return emm();
         }
     } else {
-        printf("Are you sure to closed Maintain Mode (Y/N) : ");
+    	MDS:
+    	printf("");
+    	char auth_un[10], auth_pw[10];
+    	system("cls");
+    	ini();
+    	printf("To Ensure you have permission to closed M-Mode. Please user authorised account to unlock M-Mode.\n");
+    	printf(">> ELC : %d || Reminder : %d", counter, 6 - counter);
+    	printf("\nPlease enter the account and password!\n\n");
+    	printf("// Username : ");
+    	scanf("%s", auth_un);
+    	printf("// Password : ");
+    	scanf("%s", auth_pw);
+    	sleep(1);
+    	printf("\nAuthorising ...\n" );
+    	sleep(2);
+    	if(auth(auth_un, auth_pw) != 0) {
+    		printf("\nAuthentication FAILURE, Please enter it again ...\n");
+    		counter++;
+    		sleep(2);
+    		goto MDS;
+		}
+		printf("\nPermission Check is on-going ...\n");
+		sleep(2);
+		/*Check if the permission is accepted (Perm == 0)*/
+		char path[] = "userdata\\", file[] = "\\permission.dat";
+		strcat(path, auth_un);
+		strcat(path, file);
+		FILE *getPerm = fopen(path, "r");
+		char Pcoden = fgetc(getPerm);
+		fclose(getPerm);
+		if(atoi(&Pcoden) != 0) {
+			printf("\nYou do not have enough permission to closed the M-Mode ...\n");
+			printf("\nProgram will be shutdown automatically ...\n");
+			sleep(2);
+			exit(0);
+		}
+		printf("\nAuthentication Success ... Redirecting ...\n");
+    	sleep(3);
+    	
+    	/*Start to close MMODE*/
+    	off:
+    	fflush(stdin);
+        printf("\nAre you sure to closed Maintain Mode (Y/N) : ");
         scanf("%c", &choice);
         switch(choice) {
             case 'Y':
@@ -454,99 +509,23 @@ void emm() {
                 sleep(3);
                 exit(0);
             default:
-                return emm();
+                goto off;
         }
-    }
-};
-
-void etm() {
-	FILE *IDT = fopen("testmode\\id_tm.dat", "r+");
-    if(IDT == NULL) {
-        IDT = fopen("testmode\\id_tm.dat", "a");
-        if(IDT == NULL) {
-            return failure();
-        }
-        putw(1000, IDT);
-        fclose(IDT);
-    }
-	tmd = 1;
-    system("title DANGER @ TEST Mode (ETM) Running");
-    fflush(stdin);
-    char choice;
-    ini();
-    printf("\t\t\t\t\t***  You have enter the Test Mode (ETM)  ***\n\n");
-    printf(">>> Info: Beware to use Testmod, Error may occur if EMT is insert !\n");
-    printf("\t\n***   Test Panel   ***\n");
-    printf("\na. Additional Test");
-    printf("\nd. Display Test");
-    printf("\ns. Search Test");
-    printf("\nm. Removal Test");
-    printf("\nr. Reset Data in Test Mode Docs.");
-    printf("\ne. Exit in Test Mode.\n");
-    printf("\nPlease Enter the options < a / d / s / m / r / e > : ");
-    scanf("%c", &choice);
-    switch(choice) {
-    	case 'A':
-        case 'a':       	
-            rev_value = 1;
-            system("cls");
-            NEW_Record:
-            fflush(stdin);
-            printf("\n>> You have enter the Test Mode (ETM) @ Additional Test\n\n");
-            printf("Record ID, Item ID will be Auto generated.\n");
-            printf("\nFormat: Item Name | CTG | Quantity | Weight | Recipient | Final Dest. | Devl. Stat.\n");
-            printf("Please Enter The Record Data : ");
-            scanf("%s%s%d%lf%s%s%s", Data.ItemName, Data.category, &Data.quantity, &Data.weight, Data.recip, Data.FinalDest, Data.dev_stat);
-            fflush(stdin);
-            WriteInFile(Data);
-            char choice;
-            printf("\nWould you like to input another data? ( Y / N ) : ");
-            scanf("%c", &choice);
-            if(choice == 'y' || choice == 'Y') {
-               goto NEW_Record;
-            } else {
-                printf("\nYour Record are writing to file, please wait ...");
-                sleep(3);
-                system("cls");
-                return etm();
-            }
-        case 'D':
-        case 'd':
-            rev_value = 1;
-            char str[1024];
-            system("cls");
-            printf("'\n\t***  You have enter the Test Mode (ETM) @ Display Test  ***\n\n");
-            FILE *display = fopen("testmode\\testmode.dat", "r");
-            while(fgets(str, sizeof(str), display)) {
-                printf("%s", str);              
-            }
-            fclose(display);
-            
-            
-        case 'E':
-        case 'e':
-            printf("\nYou will leave test mode very soon ...\n");
-            sleep(2);
-            printf("\nSaving your test mode result ...\n");
-            sleep(3);
-            return SysPanel();            		
     }
 };
 
 /*Functions*/
-int DataCheck(int type) {
-    char TMD[50] = "testmode\\testmode.dat", REL[20] = "stock.txt", TPI[20];
+int DataCheck() {
+    char TPI[20];
     int return_value;
-    FILE *DCT = fopen(((type == 0) ? REL : TMD), "r");
+    FILE *DCT = fopen("stock.txt", "r");
     if(fgets(TPI, sizeof(TPI), DCT) != NULL) {
         return_value = 1;
     }
     return return_value;
 };
 
-void WriteInFile(struct Data dataIO, int type) {
-    char TMD[50] = "testmode\\testmode.dat", REL[20] = "stock.txt", IDT[20] = "testmode\\id_tm.dat", IDR[20] = "id.dat";
-    int dc = (type == 0) ? 0 : 1;
+void WriteInFile(struct Data dataIO) {
     int max = 1000, min = 1, value = 0;
 	
     /*Replace '_' / '@' / '-' to ' '*/
@@ -554,11 +533,12 @@ void WriteInFile(struct Data dataIO, int type) {
     rw(Data.recip);
     rw(Data.FinalDest);
     rw(Data.FinalDest);
-    FILE *WriteIn = fopen(((type == 0) ? REL : TMD), (((DataCheck(dc) == 0) ? "w+" : "a+")));
     
     /*ID Get F(x)*/
-    FILE *IDRE = fopen((tmd == 0) ? IDR : IDT, "r");
-    value = getw(IDRE);    
+    FILE *IDRE = fopen("system\\id.dat", "r");
+    value = getw(IDRE); 
+	
+	FILE *WriteIn = fopen("stock.txt", (((DataCheck() == 0) ? "w+" : "a+")));   
     
     /* ---- WriteIn Started ----*/
     fprintf(WriteIn, "---Start of Record (%d)---\n", value);
@@ -574,13 +554,13 @@ void WriteInFile(struct Data dataIO, int type) {
     fprintf(WriteIn, "--- End of Record (%d)---\n", value);      
     fclose(WriteIn);
     
-    FILE *ID = fopen((tmd == 0) ? IDR : IDT, "r");
+    char PATH[] = "system\\id.dat";
+    FILE *ID = fopen(PATH, "r");
     value = getw(ID);
-    fclose(ID);
-    FILE *IDW = fopen((tmd == 0) ? IDR : IDT, "w");
+    ID = fopen(PATH, "w");
     value++;
-    putw(value, IDW);
-	fclose(IDW);
+    putw(value, ID);
+	fclose(ID);
 };
 
 void rw(char buf[]) {
@@ -635,32 +615,58 @@ void pret() {
 }
 
 void startup() {
-	char err = 0;
-	/*Check "pwd.dat"*/
-	FILE *start_pwd;
-	start_pwd = fopen("pwd.dat", "r+");
-	if(start_pwd == NULL) {
-		start_pwd = fopen("pwd.dat", "a");
-		if(start_pwd == NULL) {
-			return failure();
-		}
-		fprintf(start_pwd, "admin");
-		fclose(start_pwd);
-	} 
-	printf("\n System: (pwd.dat) Configuration Successful Loaded\n");
+	char err = 0, d1[50], d2[50], PATH[] = "\\userdata", SPATH[] = "\\system";
+	/*Check "userdata"*/
+	getcwd(d1, sizeof(d1));
+	strcat(d1, PATH);
+	DIR* dir = opendir(d1);
+	if(dir) {
+		closedir(dir);
+	} else {
+		system("mkdir userdata");
+	}
+	printf(" Initiator : userdata (folder) initate successfully.\n");
+	sleep(1);
 	
-	/*Check "spwd.dat"*/
-	FILE *start_spwd;
-	start_pwd = fopen("spwd.dat", "r+");
-	if(start_spwd == NULL) {
-		start_spwd = fopen("spwd.dat", "a");
-		if(start_spwd == NULL) {
+	/*Check "system"*/
+	getcwd(d2, sizeof(d2));
+	strcat(d2, SPATH);
+	DIR *sdir = opendir(d2);
+	if(sdir) {
+		closedir(sdir);
+	} else {
+		system("mkdir system");
+	}
+	printf("\n Initiator : system (folder) initate successfully.\n");
+	sleep(1);
+	
+	/*Check "userdata\\udc.dll"*/
+	char PATH1[] = "userdata\\udc.dll";
+	FILE *start_udc = fopen(PATH1, "r+");
+	if(start_udc == NULL) {
+		start_udc = fopen(PATH1, "a");
+		if(start_udc == NULL) {
 			return failure();
 		}
-		fprintf(start_spwd, "admin");
-		fclose(start_spwd);
+		fprintf(start_udc, "userdata (folder) exsist & No error have occured.");
+		fclose(start_udc);
 	} 
-	printf("\n System: (spwd.dat) Configuration Successful Loaded\n");
+	printf("\n FILE Initiator: (udc.dll) Configuration Successful Loaded\n");
+	sleep(1);
+	
+	/*Check "system\\sdc.dat"*/
+	char PATH2[] = "system\\sdc.dat";
+	FILE *start_sdc = fopen(PATH2, "r+");
+	if(start_sdc == NULL) {
+		start_sdc = fopen(PATH, "a");
+		if(start_sdc == NULL) {
+			return failure();
+		}
+		fprintf(start_sdc, "system (folder) exsist & No error have occured.");
+		fclose(start_sdc);
+	} 
+	printf("\n FILE Initiator: (sdc.dll) Configuration Successful Loaded\n");
+	sleep(1);
 	
 	/*Check "stock.txt"*/
 	FILE *start_stock;
@@ -672,6 +678,8 @@ void startup() {
 		}
 		fclose(start_stock);
 	}
+	printf("\n Record Initiator: (stock.txt) Configuration Successful Loaded\n");
+	sleep(1);
 	
 	/*Check "maintain.dat"*/
 	FILE *start_config_mat;
@@ -684,19 +692,10 @@ void startup() {
 		fprintf(start_config_mat, "0");
 		fclose(start_config_mat);
 	}
-	printf("\n System: (maintain.dat) Configuration Successful Loaded\n");
-	printf("\n System: (STU) Configuration Successful Loaded\n");
-	
-    /*Check "testmode.dat"*/
-    FILE *start_tmd = fopen("testmode\\testmode.dat", "r+");
-    if(start_tmd == NULL) {
-        start_tmd = fopen("testmode\\testmode.dat", "a");
-        if(start_tmd == NULL) {
-            return failure();
-        }
-        fclose(start_tmd);
-    }
-    printf("\n System: (TMD) Configuration Successful Loaded\n");
+	printf("\n Maintain System: (maintain.dat) Configuration Successful Loaded\n");
+	sleep(1);
+	printf("\n Maintain System: (STU) Configuration Successful Loaded\n");
+	sleep(1);
     
     /*Check "id.dat & id_tm.dat"*/
     FILE *IDR = fopen("id.dat", "r+");
@@ -709,17 +708,7 @@ void startup() {
         fclose(IDR);
     }
     printf("\n System: (IDR) Configuration Successful Loaded\n");
-    
-    FILE *IDT = fopen("testmode\\id_tm.dat", "r+");
-    if(IDT == NULL) {
-        IDT = fopen("testmode\\id_tm.dat", "a");
-        if(IDT == NULL) {
-            return failure();
-        }
-        putw(1000, IDT);
-        fclose(IDT);
-    }
-    printf("\n System: (IDT) Configuration Successful Loaded\n");
+    sleep(1);
 }
     
 void getConfig() {
@@ -735,9 +724,9 @@ void getConfig() {
 	fclose(extract_mcg);
 	system("title HKUSPACE IMRS @ Initialising");
 	printf("\n The System are keep loading, please wait .... \n");
-	sleep(5);
+	sleep(3);
 	system("title HKUSPACE IMRS @ Successfully loaded");
-	sleep(4);
+	sleep(2);
 	system("cls");	
 };
 
