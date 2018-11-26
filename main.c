@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <Windows.h> //Windows System Library
 #include <Lmcons.h> //Username Library
-#include <unistd.h>
-#include <dos.h>
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
@@ -35,7 +32,7 @@ void cperm();
 void emm();
 
 /*Functions*/
-int auth(char [], char []);
+int auth(char [], char[]);
 void startup();
 void rw();
 void WriteInFile();
@@ -78,14 +75,15 @@ void menu() {
     FILE *maintain = fopen("system\\maintain.dat", "r");
     char Mcoden = fgetc(maintain);
     if(atoi(&Mcoden) == 1) {
+        system("title HKUSPACE IRMS @ Maintain Mode @ ON");
     	ini();
     	printf("Sorry, Mantain Mode is enabled, Only System Administrator are able to login to IMRS.\n\n");
     	printf("If you think this contain any Error, please contact the System Administrator. Sorry for inconvence.\n\n");
     	printf("You will be redirect to MMD Identification Authorization Cneter.\n");
-    	sleep(5);
+    	Sleep(5000);
     	return emm();
 	}
-    
+
     /*Get Username
     wchar_t Username[1000];
     DWORD nUsername = sizeof(Username);
@@ -98,7 +96,7 @@ void menu() {
     char choice;
 	if(counter == 5) {
 		printf("You have type in the max. no. of wrong password, the program will auto exit in 5 seconds.\n\n");
-		sleep(5);
+		Sleep(5000);
 		exit(0);
 	}
 	printf(">> Status : %s\n\n", (counter == 0) ? Normal : LIF);
@@ -118,12 +116,12 @@ void menu() {
 	if(auth(username, password) != 0) {
 		printf("\nAuthorization Failure, Please wait for 3 sec. to return LOG-IN Platform.");
 		counter++;
-		sleep(3);
+		Sleep(3000);
 		goto MENU;
 	}
 	printf("\nAuthorization Success, Getting the Permissions from PSCF.\n");
-	sleep(1);
-	
+	Sleep(1000);
+
 	/*Get the permission*/
 	char path[] = "userdata\\", file[] = "\\permission.dat";
 	strcat(path, username);
@@ -134,33 +132,33 @@ void menu() {
 	fclose(getPerm);
 	if(permission == 0) {
 	    printf("\nYou are belongs to >> SYS. Admin. Redirecting to Relative GUI Panel ...\n");
-	    sleep(2);
+	    Sleep(2000);
 	    return SysPanel();
 	} if(permission == 1) {
         printf("\nYou are belongs to >> SHOP Admin. Redirecting to Relative GUI Panel ...\n");
-        sleep(2);
+        Sleep(2000);
         return SAPanel();
 	} if(permission == 2) {
 	    printf("\nYou are belong to >> Customer. Redirecting to Relative GUI Panel ...");
-	    sleep(2);
+	    Sleep(2000);
 	    return CustomerPanel();
 	} else {
 	    printf("\nAn error occur. Auto-fixing ....\n");
-	    sleep(2);
+	    Sleep(2000);
 	    printf("\nFix FAILURE ... Redirecting\n");
-	    sleep(2);
+	    Sleep(2000);
         return failure();
-	}	
+	}
 	fflush(stdin);
 };
 
 /*Main Function*/
 int main() {
-	emm();
+	menu();
 }
 
 void reg() {
-	
+
 };
 
 /*Customer Panel & System / Shop Admin. Menu*/
@@ -205,7 +203,7 @@ void SAPanel() {
     scanf("%d", &choice);
     if(choice > 6 && choice < 10) {
     	printf("\nYou are only allow to enter 1 - 6 & 10, %d are not allowed !", choice);
-    	sleep(2);
+    	Sleep(2000);
     	return SAPanel();
 	}
     choices(choice);
@@ -247,13 +245,13 @@ void choices(int type) {
             break;
         case 10:
         	printf("\nYou have selected Logout, Exiting Session ...\n");
-        	sleep(3);
+        	Sleep(3000);
         	printf("\nThankyou for using HKUSPACE IMRS ^v^");
-        	sleep(2);
+        	Sleep(2000);
         	exit(0);
         default:
             printf("No this option < %d >, < 1 - 10> Only.\n", type);
-            sleep(3);
+            Sleep(3000);
             system("cls");
             /*0 = SYS / 1 = SHOP / 2 = Customer*/
             if(permission == 0) {
@@ -287,7 +285,7 @@ void addition() {
         goto NEW_Record;
     } else {
         printf("\nYour Record are writing to file, please wait ...");
-        sleep(3);
+        Sleep(3000);
         system("cls");
         return pret();
     }
@@ -317,7 +315,7 @@ void cpwd() {
 	char PW[10], NPWD[10], CNP[10];
     if (counter == 5) {
         printf("\nError attempts lager than 5. To prevent Unauthorised Access, Exit in 5 second!\n\n");
-        sleep(5);
+        Sleep(5000);
         system("CLS");
         exit(0);
     }
@@ -340,8 +338,8 @@ void cpwd() {
     	if(strcmp(NPWD, CNP) != 0) {
     		ini();
     		printf("You are required to Enter Again.\n\n");
-    		printf("Please wait in few second\n");  
-			sleep(2);
+    		printf("Please wait in few second\n");
+			Sleep(2000);
 			system("cls");
 			fflush(stdin);
 			goto PwTypo;
@@ -358,7 +356,7 @@ void cpwd() {
 	fprintf(PWD, "%s", NPWD);
 	fclose(PWD);
 	printf("\nPassword Successfully Changed, Return in 5 seconds");
-	sleep(5);
+	Sleep(5000);
 	pret();
 };
 
@@ -368,7 +366,7 @@ void cperm() {
     ini();
     if(counter >= 5) {
     	printf("Max. Error Attemp ... Exit in few sec.");
-    	sleep(3);
+    	Sleep(3000);
     	exit(0);
 	}
     printf("***   Authorization Session   ***\n\n");
@@ -380,12 +378,12 @@ void cperm() {
     scanf("%s", PW);
     if(auth(username, PW) != 0) {
     	printf("\nIdentification FAILURE !! Please wait for few Seconds ...");
-    	sleep(3);
+    	Sleep(3000);
     	counter++;
     	return cperm();
     }
     printf("\nAuthorization Success ... Wait ...\n");
-	sleep(3);
+	Sleep(3000);
     STNP:
     system("cls");
     ini();
@@ -393,14 +391,14 @@ void cperm() {
     scanf("%s", IUN);
     char path[] = "userdata\\", permfile[] = "\\permission.dat", UN[10];
     strcpy(UN, IUN);
-	strcat(path, IUN); 
+	strcat(path, IUN);
 	strcat(path, permfile);
     FILE *search = fopen(path, "r");
     if(search == NULL) {
       	printf("\nNo this User : %s", UN);
-       	sleep(5);
+       	Sleep(5000);
        	goto STNP;
-	} 
+	}
 	fclose(search);
     printf("\nPlease enter the New permission for %s : ", UN);
     scanf("%s", PERM);
@@ -411,7 +409,7 @@ void cperm() {
     fputs(PERM, SPRM);
     fclose(SPRM);
     printf("\n\nPermission Successfully Changed ... Please wait for 3 Second");
-    sleep(3);
+    Sleep(3000);
     pret();
 }
 
@@ -434,14 +432,14 @@ void emm() {
                 fprintf(maintain, "%d", index);
                 fclose(maintain);
                 printf("\nMaintain Mode is Successfully enabled. To prevent error in IRMS, the program will auto restart in 5 seconds.");
-                sleep(5);
+                Sleep(5000);
                 system("cls");
                 return menu();
                 break;
             case 'n':
             case 'N':
                 printf("\nYou have selected < N > in EMM. You will be return to Admin. Panel in few seconds.");
-                sleep(3);
+                Sleep(3000);
                 return SysPanel();
                 break;
             default:
@@ -460,17 +458,17 @@ void emm() {
     	scanf("%s", auth_un);
     	printf("// Password : ");
     	scanf("%s", auth_pw);
-    	sleep(1);
+    	Sleep(1000);
     	printf("\nAuthorising ...\n" );
-    	sleep(2);
+    	Sleep(2000);
     	if(auth(auth_un, auth_pw) != 0) {
     		printf("\nAuthentication FAILURE, Please enter it again ...\n");
     		counter++;
-    		sleep(2);
+    		Sleep(2000);
     		goto MDS;
 		}
 		printf("\nPermission Check is on-going ...\n");
-		sleep(2);
+		Sleep(2000);
 		/*Check if the permission is accepted (Perm == 0)*/
 		char path[] = "userdata\\", file[] = "\\permission.dat";
 		strcat(path, auth_un);
@@ -481,12 +479,12 @@ void emm() {
 		if(atoi(&Pcoden) != 0) {
 			printf("\nYou do not have enough permission to closed the M-Mode ...\n");
 			printf("\nProgram will be shutdown automatically ...\n");
-			sleep(2);
+			Sleep(2000);
 			exit(0);
 		}
 		printf("\nAuthentication Success ... Redirecting ...\n");
-    	sleep(3);
-    	
+    	Sleep(3000);
+
     	/*Start to close MMODE*/
     	off:
     	fflush(stdin);
@@ -500,13 +498,13 @@ void emm() {
                 fprintf(maintain, "%d", rev_index);
                 fclose(maintain);
                 printf("\nMaintain Mode is Successfully disabled. To prevent error in IRMS, the program will auto restart in 5 seconds.");
-                sleep(5);
+                Sleep(5000);
                 system("cls");
                 return menu();
             case 'n':
             case 'N':
                 printf("\nYou have selected < N > in EMM. You will be exit the IRMS in few seconds.");
-                sleep(3);
+                Sleep(3000);
                 exit(0);
             default:
                 goto off;
@@ -527,19 +525,19 @@ int DataCheck() {
 
 void WriteInFile(struct Data dataIO) {
     int max = 1000, min = 1, value = 0;
-	
+
     /*Replace '_' / '@' / '-' to ' '*/
     rw(Data.ItemName);
     rw(Data.recip);
     rw(Data.FinalDest);
     rw(Data.FinalDest);
-    
+
     /*ID Get F(x)*/
     FILE *IDRE = fopen("system\\id.dat", "r");
-    value = getw(IDRE); 
-	
-	FILE *WriteIn = fopen("stock.txt", (((DataCheck() == 0) ? "w+" : "a+")));   
-    
+    value = getw(IDRE);
+
+	FILE *WriteIn = fopen("stock.txt", (((DataCheck() == 0) ? "w+" : "a+")));
+
     /* ---- WriteIn Started ----*/
     fprintf(WriteIn, "---Start of Record (%d)---\n", value);
     fprintf(WriteIn, "Record ID: %d\n", value);
@@ -551,9 +549,9 @@ void WriteInFile(struct Data dataIO) {
     fprintf(WriteIn, "Recipient: %s\n", Data.recip);
     fprintf(WriteIn, "Final Destination: %s\n", Data.FinalDest);
     fprintf(WriteIn, "Delivery Status: %s\n", Data.dev_stat);
-    fprintf(WriteIn, "--- End of Record (%d)---\n", value);      
+    fprintf(WriteIn, "--- End of Record (%d)---\n", value);
     fclose(WriteIn);
-    
+
     char PATH[] = "system\\id.dat";
     FILE *ID = fopen(PATH, "r");
     value = getw(ID);
@@ -573,32 +571,32 @@ void rw(char buf[]) {
 	}
 }
 
-int auth(char un[], char pw[]) {
+int auth(char username[], char password[]) {
 	/*Path declearation*/
 	char path_acc[] = "userdata\\", path_pw[] = "userdata\\", acc[] = "\\username.dat", pwd[] = "\\password.dat";
 	int c1 = 0, c2 = 0, r1 = 0, r2 = 0, result = -1;
 	char match_ac[50], match_pw[50];
 	/*Export Account*/
-	strcat(path_acc, un);
+	strcat(path_acc, username);
 	strcat(path_acc, acc);
 	FILE *extract_ac = fopen(path_acc, "r");
 	fgets(match_ac, sizeof(match_ac), extract_ac);
 	fclose(extract_ac);
 	/*Export Password*/
-	strcat(path_pw, un);
+	strcat(path_pw, username);
 	strcat(path_pw, pwd);
 	FILE *extract_pwd = fopen(path_pw, "r");
 	fgets(match_pw, sizeof(match_pw), extract_pwd);
 	fclose(extract_pwd);
-	
-	r1 = strcmp(un, match_ac);
-	r2 = strcmp(pw, match_pw);
+
+	r1 = strcmp(username, match_ac);
+	r2 = strcmp(password, match_pw);
 	if(r1 == 0 && r2 == 0) {
 		result = 0;
 	} else {
 		result = 1;
 	}
-	
+
 	return result;
 }
 
@@ -626,8 +624,8 @@ void startup() {
 		system("mkdir userdata");
 	}
 	printf(" Initiator : userdata (folder) initate successfully.\n");
-	sleep(1);
-	
+	Sleep(1000);
+
 	/*Check "system"*/
 	getcwd(d2, sizeof(d2));
 	strcat(d2, SPATH);
@@ -638,8 +636,8 @@ void startup() {
 		system("mkdir system");
 	}
 	printf("\n Initiator : system (folder) initate successfully.\n");
-	sleep(1);
-	
+	Sleep(1000);
+
 	/*Check "userdata\\udc.dll"*/
 	char PATH1[] = "userdata\\udc.dll";
 	FILE *start_udc = fopen(PATH1, "r+");
@@ -650,10 +648,10 @@ void startup() {
 		}
 		fprintf(start_udc, "userdata (folder) exsist & No error have occured.");
 		fclose(start_udc);
-	} 
+	}
 	printf("\n FILE Initiator: (udc.dll) Configuration Successful Loaded\n");
-	sleep(1);
-	
+	Sleep(1000);
+
 	/*Check "system\\sdc.dat"*/
 	char PATH2[] = "system\\sdc.dat";
 	FILE *start_sdc = fopen(PATH2, "r+");
@@ -664,10 +662,10 @@ void startup() {
 		}
 		fprintf(start_sdc, "system (folder) exsist & No error have occured.");
 		fclose(start_sdc);
-	} 
+	}
 	printf("\n FILE Initiator: (sdc.dll) Configuration Successful Loaded\n");
-	sleep(1);
-	
+	Sleep(1000);
+
 	/*Check "stock.txt"*/
 	FILE *start_stock;
 	start_stock = fopen("stock.txt", "r+");
@@ -679,8 +677,8 @@ void startup() {
 		fclose(start_stock);
 	}
 	printf("\n Record Initiator: (stock.txt) Configuration Successful Loaded\n");
-	sleep(1);
-	
+	Sleep(1000);
+
 	/*Check "maintain.dat"*/
 	FILE *start_config_mat;
 	start_config_mat = fopen("system\\maintain.dat", "r+");
@@ -693,10 +691,10 @@ void startup() {
 		fclose(start_config_mat);
 	}
 	printf("\n Maintain System: (maintain.dat) Configuration Successful Loaded\n");
-	sleep(1);
+	Sleep(1000);
 	printf("\n Maintain System: (STU) Configuration Successful Loaded\n");
-	sleep(1);
-    
+	Sleep(1000);
+
     /*Check "id.dat & id_tm.dat"*/
     FILE *IDR = fopen("id.dat", "r+");
     if(IDR == NULL) {
@@ -708,9 +706,9 @@ void startup() {
         fclose(IDR);
     }
     printf("\n System: (IDR) Configuration Successful Loaded\n");
-    sleep(1);
+    Sleep(1000);
 }
-    
+
 void getConfig() {
 	/*"maintain.dat" Exports*/
 	char file_name[256] = "system\\maintain.dat", mt_confg[2];
@@ -720,14 +718,14 @@ void getConfig() {
 			printf("\n System: (MCG) Successful Loaded\n");
 		}
 		maintain = atoi(mt_confg);
-	} 
+	}
 	fclose(extract_mcg);
 	system("title HKUSPACE IMRS @ Initialising");
 	printf("\n The System are keep loading, please wait .... \n");
-	sleep(3);
+	Sleep(3000);
 	system("title HKUSPACE IMRS @ Successfully loaded");
-	sleep(2);
-	system("cls");	
+	Sleep(2000);
+	system("cls");
 };
 
 void failure() {
@@ -736,6 +734,6 @@ void failure() {
 	printf("\t\n***   System Initial Failure   ***\n");
 	printf("Reason : Disc full or no permission\n\n");
 	printf("To prevent further System Error, exit mode in 5 seconds.\n");
-	sleep(5);
+	Sleep(5000);
 	exit(0);
 };
