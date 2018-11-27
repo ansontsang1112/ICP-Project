@@ -1,8 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <Windows.h> //Windows System Library
-#include <Lmcons.h> //Username Library
+#include <ctype.h>
+#include <windows.h> //Windows System Library
+#include <lmcons.h> //Username Library
+#include <unistd.h>
+#include <dos.h>
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
@@ -10,6 +13,7 @@
 /*Function Proto Type*/
 /*Menu GUI(s)*/
 void ini();
+void au_ini();
 void menu();
 void SysPanel();
 void SAPanel();
@@ -30,9 +34,11 @@ void del();
 void cpwd();
 void cperm();
 void emm();
+void sd();
+void buyanitem();
 
 /*Functions*/
-int auth(char [], char[]);
+int auth(char [], char []);
 void startup();
 void rw();
 void WriteInFile();
@@ -46,6 +52,7 @@ struct Data {
     int rid;
     char ItemName[50];
     int id;
+    int price;
     char category[50];
     int quantity;
     double weight;
@@ -55,15 +62,23 @@ struct Data {
 }Data ;
 
 /*Globes Var*/
-int counter = 0, role = 0, rev_value = 0, maintain, tmd, permission;
+int counter = 0, role = 0, rev_value = 0, maintain, tmd, permission, money;
 char appear;
 char Normal[] = "Please enter the password", LIF[] = "Authorization Failure, Please try again.";
-char username[50], password[50], money[20];
+char username[50], password[50];
 
 void ini() {
     printf("\t***   Welcome to HKUSPACE Inventory Management and Record System   ***\n\n");
     printf("\t\t***    1819S1    ***\n\n");
-    printf("\t*** This system is developed by CCIT4020 Class No. ?L-?? Group No,?? ***\n\n\n");
+    printf("\t*** This system is developed by CCIT4020 Class No. ?L-?? Group No,?? ***\n\n");
+}
+
+void au_ini() {
+    char pvtopd[50];
+    printf("Welcome, < %s >, You have already login to HKUSPACE IRMS, Profile below [] ", username);
+    printf("\n\nLogin Name : %s\n", username);
+    printf("Password (IVALUE) : %d\n", (int)password);
+    printf("Money (Coins) : %d\n\n", money);
 }
 
 void menu() {
@@ -75,7 +90,6 @@ void menu() {
     FILE *maintain = fopen("system\\maintain.dat", "r");
     char Mcoden = fgetc(maintain);
     if(atoi(&Mcoden) == 1) {
-        system("title HKUSPACE IRMS @ Maintain Mode @ ON");
     	ini();
     	printf("Sorry, Mantain Mode is enabled, Only System Administrator are able to login to IMRS.\n\n");
     	printf("If you think this contain any Error, please contact the System Administrator. Sorry for inconvence.\n\n");
@@ -122,6 +136,14 @@ void menu() {
 	printf("\nAuthorization Success, Getting the Permissions from PSCF.\n");
 	Sleep(1000);
 
+    /*Get the Money*/
+	char path_m[] = "userdata\\", file_m[] = "\\money.dat";
+    strcat(path_m, username);
+	strcat(path_m, file_m);
+	FILE *getMoney = fopen(path_m, "r+");
+	money = getw(getMoney);
+	fclose(getMoney);
+
 	/*Get the permission*/
 	char path[] = "userdata\\", file[] = "\\permission.dat";
 	strcat(path, username);
@@ -154,7 +176,7 @@ void menu() {
 
 /*Main Function*/
 int main() {
-	menu();
+	buyanitem();
 }
 
 void reg() {
@@ -166,19 +188,18 @@ void SysPanel() {
 	system("cls");
     int choice;
     ini();
+    au_ini();
     counter = 0;
-    printf("***   Shop Administration Panel   ***\n\n");
+    printf(" 0. Logout\n");
     printf(" 1. Add New Item<s>\n");
     printf(" 2. Display Item Record<s>\n");
     printf(" 3. Search Item Information<s>\n");
     printf(" 4. Modify Item Information<s>\n");
     printf(" 5. Delete Item Record<s>\n");
-    printf("\n***   System Administration & Slef Panel   ***\n\n");
     printf(" 6. Change Users Password\n");
     printf(" 7. Change Permission of Specific Users\n");
     printf(" 8. Enable / Disable Maintain Mode\n");
     printf(" 9. Enable Self Destruction Mode\n");
-    printf("10. Logout\n");
     printf("\n What is your option <1-10> ? || ");
     scanf("%d", &choice);
     choices(choice);
@@ -188,17 +209,16 @@ void SAPanel() {
 	system("cls");
     int choice;
     ini();
+    au_ini();
     counter = 0;
-    printf("***   Shop Administration Panel   ***\n\n");
+    printf(" 0. Logout\n");
     printf(" 1. Add New Item<s>\n");
     printf(" 2. Display Item Record<s>\n");
     printf(" 3. Search Item Information<s>\n");
     printf(" 4. Modify Item Information<s>\n");
     printf(" 5. Delete Item Record<s>\n");
-    printf("\n***   Administration & Self Panel   ***\n\n");
     printf(" 6. Change Users Password\n");
-    printf("10. Logout\n");
-    printf("\n What is your option <1-6, 10 > ? || ");
+    printf("\n What is your option <0-6> ? || ");
     fflush(stdin);
     scanf("%d", &choice);
     if(choice > 6 && choice < 10) {
@@ -239,11 +259,14 @@ void choices(int type) {
             cperm();
             break;
         case 8:
+            counter == 0;
             emm();
             break;
         case 9:
+            counter == 0;
+            sd();
             break;
-        case 10:
+        case 0:
         	printf("\nYou have selected Logout, Exiting Session ...\n");
         	Sleep(3000);
         	printf("\nThankyou for using HKUSPACE IMRS ^v^");
@@ -272,10 +295,12 @@ void addition() {
     NEW_Record:
     fflush(stdin);
     printf("\n>> You have enter the Additional Mode\n\n");
-    printf("Record ID, Item ID will be Auto generated.\n");
-    printf("\nFormat: Item Name | Category | Quantity | Weight | Recipient | Final Dest. | Devl. Stat.\n");
+    printf("Record ID, Item ID will be Auto Generated.\n");
+    printf("\nFormat: Item Name | Price per quantity | Category | Quantity | Weight | Final Destination\n");
     printf("\nPlease Enter The Record Data : ");
-    scanf("%s%s%d%lf%s%s%s", Data.ItemName, Data.category, &Data.quantity, &Data.weight, Data.recip, Data.FinalDest, Data.dev_stat);
+    scanf("%s%s%d%lf%s", Data.ItemName, &Data.price, Data.category, &Data.quantity, &Data.weight, Data.FinalDest);
+    Data.dev_stat[50] = "Storing";
+    Data.recip[50] = "Storage";
     fflush(stdin);
     WriteInFile(Data);
     char choice;
@@ -512,6 +537,161 @@ void emm() {
     }
 };
 
+void sd() {
+	char tmp_usr[25], tmp_pwd[25];
+	system("title HKUSPACE IMRS Danger @ Self Destruction Mode");
+	system("cls");
+	ini();
+	if(counter >= 3) {
+		printf("\nAuthentication Failure > 3, Redirecting ....\n");
+		Sleep(3000);
+		pret();
+	}
+	printf("DANGEROUS : You have enter SELF DESTRUCTION Mode authentication center.\n");
+	printf("\nAuthentication Required ! | REMC : %d\n", 2 - counter);
+	printf(">> Password : ");
+	scanf("%s", tmp_pwd);
+	printf("\nAuthorising ...\n" );
+	Sleep(2000);
+	if(auth(username, tmp_pwd) != 0) {
+		printf("\nAuthentication Failure, Please enter again\n");
+		counter++;
+		Sleep(1000);
+		return sd();
+	}
+	printf("\nAuthentication Success, Please Wait ...\n");
+	VC:
+	printf("");
+	int arg = (999999 - 111111 + 1) + 111111;
+	int vc = rand() % arg, vci = 0;
+	printf("\nPlease enter the Verification code -> < %d > : ", vc);
+	scanf("%d", &vci);
+	if(vci != vc) {
+		printf("\nVerification Failure ...\n");
+		Sleep(2000);
+		goto VC;
+	}
+	char choice;
+	fflush(stdin);
+	printf("\nAre you sure to active SELF DESTRUCTION Mode ? ( Y / N ) : ");
+	scanf("%c", &choice);
+	switch(choice) {
+		case 'N':
+		case 'n':
+			printf("\nSELF DESTRUCTION Mode >> Off, Redirecting");
+			Sleep(3000);
+			return SysPanel();
+		case 'y':
+		case 'Y':
+			printf("\nSELF DESTRUCTION Mode >> On ... Please Wait.");
+			Sleep(3000);
+			printf("\nAll Data will be erased ...\n");
+			FILE *fileIO = fopen("stock.txt", "w");
+			fprintf("stock.txt", "%s", "SD MODE enabled. NULL Data ...");
+			fileIO = fopen("system\\id.dat",  "w");
+			fprintf("system\\id.dat", "%s", "SD MODE enabled. NULL Value ...");
+			system("rmdir userdata /s");
+			printf("\nYour computer will shutdown in 3 seconds.");
+			Sleep(2000);
+			system("shutdown -r -t 0");
+	}
+};
+
+void buyanitem() {
+    /*Var*/
+    char buff[10240], *data_cmp, item_id[20], choice;
+    search:
+    printf("");
+    int return_vaule = 0;
+    system("cls");
+    ini();
+    au_ini();
+    printf("You have enter Shopping Center. You can only buy the ITEM that store in Storage.\n");
+    printf("\nPlease enter the Item ID of the Item : ");
+    scanf("%s", item_id);
+    fflush(stdin);
+    /*Check if the item exist*/
+    FILE *fileIO = fopen("stock.txt", "r+");
+    while(fscanf(fileIO, "%s", buff) != EOF) {
+        if(strcmp(item_id, buff) == 0) {
+            fflush(stdout);
+            return_vaule = 1;
+        }
+    }
+    if(return_vaule != 1) {
+        char choice;
+        int h = 0, i = 0, j = 0, line[3];
+        line[0] = 2, line[1] = 3, line[2] = 4;
+        system("cls");
+        ini();
+        au_ini();
+        printf("We cannot find your inserted Item ID, Would you like to retry or display all the Items ? ");
+        printf("\n\nPlease enter your choice (r = retry / d = display) : ");
+        scanf("%c", &choice);
+        printf("\n");
+        fflush(stdin);
+        if(choice == 'r' || choice == 'R') {
+            goto search;
+        } else if(choice == 'd' || choice == 'D'){
+            fileIO = fopen("stock.txt", "r");
+            while(fgets(buff, sizeof(buff), fileIO) != NULL) {
+                if(h == line[0]) {
+                    /* Display Item Name*/
+                    printf("%s", buff);
+                    line[0] += 11;
+                } if(i== line[1]) {
+                    /* Display Item ID*/
+                    printf("%s", buff);
+                    line[1] += 11;
+                } if(j == line[2]) {
+                    printf("%s\n", buff);
+                    line[2] += 11;
+                } else {
+                    h++;
+                    i++;
+                    j++;
+                }
+            }
+            printf("If you have remember and choose what you wanna buy, please type 'ANYKEY' to re-type the ID.\n");
+            system("pause");
+            goto search;
+        }
+    }
+    printf("\nItem ID < %s > has found ... Loading the info ...\n", item_id);
+    fflush(stdout);
+    Sleep(3000);
+    fileIO = fopen("stock.txt", "r+");
+    int init_value = atoi(item_id) - 1000;
+    int init_line, k = 0, l;
+    if(init_value == 0) {
+        init_line = 0;
+    } else {
+        init_line = init_value + init_value * 10 + 1;
+    }
+    int term_line = init_line + 12;
+    while(fgets(buff, sizeof(buff), fileIO) != NULL) {
+        if(k == init_line) {
+            printf("%s", buff);
+            init_line++;
+            if(init_line >= term_line) {
+                break;
+            }
+        }
+        k++;
+    }
+    fclose(fileIO);
+    fflush(stdin);
+    printf("\nWould You like to buy this Item ? <ID = %s> ( Y / N ): ", item_id);
+    scanf("%c", &choice);
+    if(choice != 'Y' || choice != 'y') {
+        printf("\nWe hope you will enjoy your shopping Journey !! ^v^ !!");
+        Sleep(2000);
+        pret();
+    }
+    /*Check if money are equal.*/
+
+}
+
 /*Functions*/
 int DataCheck() {
     char TPI[20];
@@ -530,7 +710,7 @@ void WriteInFile(struct Data dataIO) {
     rw(Data.ItemName);
     rw(Data.recip);
     rw(Data.FinalDest);
-    rw(Data.FinalDest);
+    rw(Data.dev_stat);
 
     /*ID Get F(x)*/
     FILE *IDRE = fopen("system\\id.dat", "r");
@@ -543,7 +723,8 @@ void WriteInFile(struct Data dataIO) {
     fprintf(WriteIn, "Record ID: %d\n", value);
     fprintf(WriteIn, "Item Name: %s\n", Data.ItemName);
     fprintf(WriteIn, "Item ID: %d\n", value);
-    fprintf(WriteIn, "Catagory: %d\n", Data.category);
+    fprintf(WriteIn, "Prices: %d\n", Data.price * Data.quantity);
+    fprintf(WriteIn, "Catagory: %s\n", Data.category);
     fprintf(WriteIn, "Quantity: %d\n", Data.quantity);
     fprintf(WriteIn, "Weight: %.3lf Kg\n", Data.weight);
     fprintf(WriteIn, "Recipient: %s\n", Data.recip);
@@ -571,26 +752,26 @@ void rw(char buf[]) {
 	}
 }
 
-int auth(char username[], char password[]) {
-	/*Path declearation*/
+int auth(char un[], char pw[]) {
+	/*Path de-clearation*/
 	char path_acc[] = "userdata\\", path_pw[] = "userdata\\", acc[] = "\\username.dat", pwd[] = "\\password.dat";
 	int c1 = 0, c2 = 0, r1 = 0, r2 = 0, result = -1;
 	char match_ac[50], match_pw[50];
 	/*Export Account*/
-	strcat(path_acc, username);
+	strcat(path_acc, un);
 	strcat(path_acc, acc);
 	FILE *extract_ac = fopen(path_acc, "r");
 	fgets(match_ac, sizeof(match_ac), extract_ac);
 	fclose(extract_ac);
 	/*Export Password*/
-	strcat(path_pw, username);
+	strcat(path_pw, un);
 	strcat(path_pw, pwd);
 	FILE *extract_pwd = fopen(path_pw, "r");
 	fgets(match_pw, sizeof(match_pw), extract_pwd);
 	fclose(extract_pwd);
 
-	r1 = strcmp(username, match_ac);
-	r2 = strcmp(password, match_pw);
+	r1 = strcmp(un, match_ac);
+	r2 = strcmp(pw, match_pw);
 	if(r1 == 0 && r2 == 0) {
 		result = 0;
 	} else {
@@ -724,6 +905,7 @@ void getConfig() {
 	printf("\n The System are keep loading, please wait .... \n");
 	Sleep(3000);
 	system("title HKUSPACE IMRS @ Successfully loaded");
+	printf(" HKUSAPCE Inventory Management and Record System is Sucessfully Loaded");
 	Sleep(2000);
 	system("cls");
 };
