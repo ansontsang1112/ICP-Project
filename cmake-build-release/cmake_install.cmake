@@ -1,4 +1,4 @@
-# Install script for directory: H:/Git_Sync/ICP Project
+# Install script for directory: H:/Sources_Code/ICP
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,5 +40,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "H:/Git_Sync/ICP Project/cmake-build-release/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "H:/Sources_Code/ICP/cmake-build-release/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

@@ -1,1 +1,50 @@
-test
+---Start of Record (1000)---
+Record ID: 1000
+Item Name: Apple
+Item ID: 1000
+Price: 50
+Catagory: Fruit
+Quantity: 10
+Weight: 15.000 Kg
+Recipient: Eric
+Final Destination: HK
+Delivery Status: Waiting
+--- End of Record (1000)---
+---Start of Record (1001)---
+Record ID: 1001
+Item Name: Windows PC
+Item ID: 1001
+Prices: 10000
+Catagory: Computer
+Quantity: 10
+Weight: 15.000 Kg
+Recipient: Anson
+Final Destination: HK
+Delivery Status: Waiting
+--- End of Record (1001)---
+---Start of Record (1002)---
+Record ID: 1002
+Item Name: Orange
+Item ID: 1002
+Price: 70
+Catagory: Fruit
+Quantity: 10
+Weight: 1.000 Kg
+Recipient: Eric
+Final Destination: HK
+Delivery Status: Waiting
+--- End of Record (1002)---
+---Start of Record (1003)---
+Record ID: 1003
+Item Name: iPhone
+Item ID: 1003
+Price: 12500
+Catagory: Phone
+Quantity: 1
+Weight: 1.000 Kg
+Recipient: Store
+Final Destination: HK
+Delivery Status: Waiting
+--- End of Record (1003)---
+
+
