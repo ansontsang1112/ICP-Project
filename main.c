@@ -440,6 +440,7 @@ void cperm() {
     pret();
 }
 
+/* Enable maintain mode */
 void emm() {
 	system("cls");
     system("title Note @ Maintain Mode (EMM) Selecting");
