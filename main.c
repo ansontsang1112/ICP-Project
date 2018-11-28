@@ -48,7 +48,7 @@ void getConfig();
 int DataCheck();
 void pret();
 
-/*Structs Part*/
+/*Structure Part*/
 struct Data {
     int rid;
     char ItemName[50];
@@ -611,6 +611,7 @@ void sd() {
 };
 
 void buyanitem() {
+    money = 150;
     /*Var*/
     char buff[10240], *data_cmp, item_id[20], choice;
     search:
@@ -695,6 +696,7 @@ void buyanitem() {
     fflush(stdin);
     printf("\nWould You like to buy this Item ? <ID = %s> ( Y / N ): ", item_id);
     scanf("%c", &choice);
+    fflush(stdin);
     if(choice != 'Y' && choice != 'y') {
         printf("\nWe hope you will enjoy your shopping Journey !! ^v^ !!");
         Sleep(2000);
@@ -703,18 +705,40 @@ void buyanitem() {
     /*Check if money are equal. or more then the shop required*/
     fileIO = fopen("stock.txt", "r");
     /* Get the money inside */
-    int init_pd_line = atoi(item_id) - 1000, init_price_line, x = 0;
+    int init_pd_line = atoi(item_id) - 1000, init_price_line, priceCmp = 0, x = 0;
     if(init_pd_line == 0) {
     	init_price_line = 4;
 	} else {
-		init_price_line = init_pd_line * 11 + 4 + init_pd_line\;
+		init_price_line = init_pd_line * 11 + 4 + init_pd_line;
 	}
 	while(fgets(buff, sizeof(buff), fileIO) != NULL) {
 		if(x == init_price_line) {
-			printf("%s", buff);
+            rw(buff);
+			priceCmp = atoi(buff);
 		}
 		x++;
 	}
+	if(priceCmp != money && priceCmp > money) {
+        char choice;
+	    system("cls");
+	    ini();
+	    au_ini();
+        printf("\nFor Item ID = %d, You do not have enough money to buy / transfer it...\n", atoi(item_id));
+        printf("\nYou do not have enough money to buy this item.\n");
+        printf("\nFind another item ? (y / n) : ");
+        scanf("%c", &choice);
+        fflush(stdin);
+        if(choice == 'y' || choice == 'Y') {
+            buyanitem();
+            return;
+        } else {
+            pret();
+        }
+	}
+	/* Change the Owner of the Item */
+
+
+
 	fclose(fileIO);
 }
 
@@ -771,9 +795,16 @@ void WriteInFile(struct Data dataIO) {
 void rw(char buf[]) {
 	int i, length;
 	length = strlen(buf);
+	/* For Data enter by Administrator */
 	for(i = 0; i < length + 1; i++) {
 		if(buf[i] == '@' || buf[i] == '_' || buf[i] == '-') {
 			buf[i] = ' ';
+		}
+	}
+	/* For replace "Prices :" -> "0" */
+    for(i = 0; i < length; i++) {
+		if(buf[i] == 'P' || buf[i] == 'r' || buf[i] == 'i' || buf[i] == 'c' || buf[i] == 'e' || buf[i] == 's' || buf[i] == ':' || buf[i] == ' ') {
+			buf[i] = '0';
 		}
 	}
 }
@@ -937,10 +968,12 @@ void getConfig() {
 };
 
 void failure() {
+    extern int errno;
 	system("CLS");
 	ini();
-	printf("\t\n***   System Initial Failure   ***\n");
-	printf("Reason : Disc full or no permission\n\n");
+	printf("\t\n***   System Failure   ***\n");
+	printf("Value of Error: %d\n", errno);
+	printf("Reason : %s\n\n", strerror(errno));
 	printf("To prevent further System Error, exit mode in 5 seconds.\n");
 	Sleep(5000);
 	exit(0);
