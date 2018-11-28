@@ -9,6 +9,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
+#include <time.h>
 
 /*Function Proto Type*/
 /*Menu GUI(s)*/
@@ -19,6 +20,7 @@ void SysPanel();
 void SAPanel();
 void choices();
 void CustomerPanel();
+void cleanscr();
 
 /*User Login & Registation Functions*/
 void reg();
