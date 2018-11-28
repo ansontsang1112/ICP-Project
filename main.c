@@ -3,13 +3,13 @@
 #include <string.h>
 #include <ctype.h>
 #include <windows.h> //Windows System Library
-#include <lmcons.h> //Username Library
 #include <unistd.h>
 #include <dos.h>
 #include <dirent.h>
 #include <errno.h>
 #include <limits.h>
 #include <time.h>
+
 
 /*Function Proto Type*/
 /*Menu GUI(s)*/
@@ -20,7 +20,6 @@ void SysPanel();
 void SAPanel();
 void choices();
 void CustomerPanel();
-void cleanscr();
 
 /*User Login & Registation Functions*/
 void reg();
@@ -70,9 +69,9 @@ char Normal[] = "Please enter the password", LIF[] = "Authorization Failure, Ple
 char username[50], password[50];
 
 void ini() {
-    printf("\t***   Welcome to HKUSPACE Inventory Management and Record System   ***\n\n");
-    printf("\t\t***    1819S1    ***\n\n");
-    printf("\t*** This system is developed by CCIT4020 Class No. ?L-?? Group No,?? ***\n\n");
+    printf(" *** Welcome to HKUSPACE Inventory Management and Record System ***\n\n");
+    printf("\t***    1819S1    ***\n\n");
+    printf("*** This system is developed by CCIT4020 Class No. ?L-?? Group No,?? ***\n\n");
 }
 
 void au_ini() {
@@ -86,26 +85,20 @@ void au_ini() {
 void menu() {
 	startup();
 	getConfig();
-	system("title HKUSPACE IMRS @ MENU CLI (ROLE)");
+	system("title HKUSPACE IMRS @ LOG-IN Menu");
     char ch1 = 'C';
     /*Check IS Maintain Mode enabled ?*/
     FILE *maintain = fopen("system\\maintain.dat", "r");
     char Mcoden = fgetc(maintain);
     if(atoi(&Mcoden) == 1) {
     	ini();
+    	system("title HKUSPACE IMRS @ Maintain Menu");
     	printf("Sorry, Mantain Mode is enabled, Only System Administrator are able to login to IMRS.\n\n");
     	printf("If you think this contain any Error, please contact the System Administrator. Sorry for inconvence.\n\n");
     	printf("You will be redirect to MMD Identification Authorization Cneter.\n");
     	Sleep(5000);
     	return emm();
 	}
-
-    /*Get Username
-    wchar_t Username[1000];
-    DWORD nUsername = sizeof(Username);
-    GetUserName((LPWSTR)Username, &nUsername);*/
-    /*RSM Menu*/
-    /*printf(" ^v^ Welcome " << (TCHAR)Username << " use our IMRS, please select the options. ^v^\n\n");*/
     MENU:
     system("cls");
     ini();
@@ -177,7 +170,7 @@ void menu() {
 };
 
 /*Main Function*/
-int main() {
+int  main(){
 	buyanitem();
 }
 
@@ -187,6 +180,7 @@ void reg() {
 
 /*Customer Panel & System / Shop Admin. Menu*/
 void SysPanel() {
+	system("title HKUSPACE IMRS @ SYS. Admin. Panel");
 	system("cls");
     int choice;
     ini();
@@ -208,6 +202,7 @@ void SysPanel() {
 };
 
 void SAPanel() {
+	system("title HKUSPACE IMRS @ SHOP Admin. Panel");
 	system("cls");
     int choice;
     ini();
@@ -223,8 +218,8 @@ void SAPanel() {
     printf("\n What is your option <0-6> ? || ");
     fflush(stdin);
     scanf("%d", &choice);
-    if(choice > 6 && choice < 10) {
-    	printf("\nYou are only allow to enter 1 - 6 & 10, %d are not allowed !", choice);
+    if(choice > 6) {
+    	printf("\nYou are only allow to enter 0 - 6, %d are not allowed !", choice);
     	Sleep(2000);
     	return SAPanel();
 	}
@@ -232,11 +227,31 @@ void SAPanel() {
 };
 
 void CustomerPanel() {
+	system("title HKUSPACE IMRS @ Customer Panel");
+	system("cls");
+	int choice;
+    ini();
+    au_ini();
+    printf(" 0. Logout\n");
+    printf(" 1. Add New Item<s>\n");
+    printf(" 2. Display Item Record<s>\n");
+    printf(" 3. Search Item Information<s>\n");
+    printf(" 4. Modify Item Information<s>\n");
+    printf(" 5. Delete Item Record<s>\n");
+    printf(" 6. Change Users Password\n");
+    printf("10. Buy / Transfer Item form market\n");
+    printf("\n What is your option <0-6> ? || ");
 
 };
 
 void choices(int type) {
     switch (type) {
+    	case 0:
+        	printf("\nYou have selected Logout, Exiting Session ...\n");
+        	Sleep(3000);
+        	printf("\nThankyou for using HKUSPACE IMRS ^v^");
+        	Sleep(2000);
+        	exit(0);
         case 1:
             addition();
             break;
@@ -268,12 +283,8 @@ void choices(int type) {
             counter == 0;
             sd();
             break;
-        case 0:
-        	printf("\nYou have selected Logout, Exiting Session ...\n");
-        	Sleep(3000);
-        	printf("\nThankyou for using HKUSPACE IMRS ^v^");
-        	Sleep(2000);
-        	exit(0);
+        case 10:
+        	buyanitem();
         default:
             printf("No this option < %d >, < 1 - 10> Only.\n", type);
             Sleep(3000);
@@ -440,7 +451,6 @@ void cperm() {
     pret();
 }
 
-/* Enable maintain mode */
 void emm() {
 	system("cls");
     system("title Note @ Maintain Mode (EMM) Selecting");
@@ -507,7 +517,7 @@ void emm() {
 		if(atoi(&Pcoden) != 0) {
 			printf("\nYou do not have enough permission to closed the M-Mode ...\n");
 			printf("\nProgram will be shutdown automatically ...\n");
-			Sleep(2000);
+			Sleep(5000);
 			exit(0);
 		}
 		printf("\nAuthentication Success ... Redirecting ...\n");
@@ -662,16 +672,16 @@ void buyanitem() {
     }
     printf("\nItem ID < %s > has found ... Loading the info ...\n", item_id);
     fflush(stdout);
-    Sleep(3000);
+    Sleep(2000);
     fileIO = fopen("stock.txt", "r+");
     int init_value = atoi(item_id) - 1000;
-    int init_line, k = 0, l;
+    int init_line, k = 0;
     if(init_value == 0) {
         init_line = 0;
     } else {
-        init_line = init_value + init_value * 10 + 1;
+        init_line = init_value + init_value * 11 - 1;
     }
-    int term_line = init_line + 12;
+    int term_line = init_line + 11;
     while(fgets(buff, sizeof(buff), fileIO) != NULL) {
         if(k == init_line) {
             printf("%s", buff);
@@ -682,17 +692,30 @@ void buyanitem() {
         }
         k++;
     }
-    fclose(fileIO);
     fflush(stdin);
     printf("\nWould You like to buy this Item ? <ID = %s> ( Y / N ): ", item_id);
     scanf("%c", &choice);
-    if(choice != 'Y' || choice != 'y') {
+    if(choice != 'Y' && choice != 'y') {
         printf("\nWe hope you will enjoy your shopping Journey !! ^v^ !!");
         Sleep(2000);
         pret();
     }
-    /*Check if money are equal.*/
-
+    /*Check if money are equal. or more then the shop required*/
+    fileIO = fopen("stock.txt", "r");
+    /* Get the money inside */
+    int init_pd_line = atoi(item_id) - 1000, init_price_line, x = 0;
+    if(init_pd_line == 0) {
+    	init_price_line = 4;
+	} else {
+		init_price_line = init_pd_line * 11 + 4 + init_pd_line\;
+	}
+	while(fgets(buff, sizeof(buff), fileIO) != NULL) {
+		if(x == init_price_line) {
+			printf("%s", buff);
+		}
+		x++;
+	}
+	fclose(fileIO);
 }
 
 /*Functions*/
@@ -808,7 +831,7 @@ void startup() {
 		system("mkdir userdata");
 	}
 	printf(" Initiator : userdata (folder) initate successfully.\n");
-	Sleep(1000);
+	Sleep(500);
 
 	/*Check "system"*/
 	getcwd(d2, sizeof(d2));
@@ -820,7 +843,7 @@ void startup() {
 		system("mkdir system");
 	}
 	printf("\n Initiator : system (folder) initate successfully.\n");
-	Sleep(1000);
+	Sleep(500);
 
 	/*Check "userdata\\udc.dll"*/
 	char PATH1[] = "userdata\\udc.dll";
@@ -834,7 +857,7 @@ void startup() {
 		fclose(start_udc);
 	}
 	printf("\n FILE Initiator: (udc.dll) Configuration Successful Loaded\n");
-	Sleep(1000);
+	Sleep(500);
 
 	/*Check "system\\sdc.dat"*/
 	char PATH2[] = "system\\sdc.dat";
@@ -848,7 +871,7 @@ void startup() {
 		fclose(start_sdc);
 	}
 	printf("\n FILE Initiator: (sdc.dll) Configuration Successful Loaded\n");
-	Sleep(1000);
+	Sleep(500);
 
 	/*Check "stock.txt"*/
 	FILE *start_stock;
@@ -861,7 +884,7 @@ void startup() {
 		fclose(start_stock);
 	}
 	printf("\n Record Initiator: (stock.txt) Configuration Successful Loaded\n");
-	Sleep(1000);
+	Sleep(500);
 
 	/*Check "maintain.dat"*/
 	FILE *start_config_mat;
@@ -875,11 +898,11 @@ void startup() {
 		fclose(start_config_mat);
 	}
 	printf("\n Maintain System: (maintain.dat) Configuration Successful Loaded\n");
-	Sleep(1000);
+	Sleep(500);
 	printf("\n Maintain System: (STU) Configuration Successful Loaded\n");
-	Sleep(1000);
+	Sleep(500);
 
-    /*Check "id.dat & id_tm.dat"*/
+    /*Check "id.dat"*/
     FILE *IDR = fopen("id.dat", "r+");
     if(IDR == NULL) {
         IDR = fopen("id.dat", "a");
@@ -890,7 +913,7 @@ void startup() {
         fclose(IDR);
     }
     printf("\n System: (IDR) Configuration Successful Loaded\n");
-    Sleep(1000);
+    Sleep(500);
 }
 
 void getConfig() {
@@ -906,10 +929,10 @@ void getConfig() {
 	fclose(extract_mcg);
 	system("title HKUSPACE IMRS @ Initialising");
 	printf("\n The System are keep loading, please wait .... \n");
-	Sleep(3000);
+	Sleep(1000);
 	system("title HKUSPACE IMRS @ Successfully loaded");
-	printf(" HKUSAPCE Inventory Management and Record System is Sucessfully Loaded");
-	Sleep(2000);
+	printf("\n HKUSAPCE Inventory Management and Record System is Sucessfully Loaded");
+	Sleep(1000);
 	system("cls");
 };
 
