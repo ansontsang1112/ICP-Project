@@ -53,14 +53,14 @@ struct Data {
     int rid;
     char ItemName[50];
     int id;
-    int price;
+    float price;
     char category[50];
     int quantity;
-    double weight;
+    float weight;
     char recip[50];
     char FinalDest[50];
     char dev_stat[50];
-}Data ;
+}Data;
 
 /*Globes Var*/
 int counter = 0, role = 0, rev_value = 0, maintain, tmd, permission, money;
@@ -93,7 +93,7 @@ void menu() {
     if(atoi(&Mcoden) == 1) {
     	ini();
     	system("title HKUSPACE IMRS @ Maintain Menu");
-    	printf("Sorry, Mantain Mode is enabled, Only System Administrator are able to login to IMRS.\n\n");
+    	printf("Sorry, Maintain Mode is enabled, Only System Administrator are able to login to IMRS.\n\n");
     	printf("If you think this contain any Error, please contact the System Administrator. Sorry for inconvence.\n\n");
     	printf("You will be redirect to MMD Identification Authorization Cneter.\n");
     	Sleep(5000);
@@ -170,8 +170,8 @@ void menu() {
 };
 
 /*Main Function*/
-int  main(){
-	buyanitem();
+int main(int argc, char **argv){
+	menu();
 }
 
 void reg() {
@@ -305,17 +305,18 @@ void choices(int type) {
 void addition() {
     system("cls");
     ini();
+    printf("\n>> You have enter the Additional Mode\n\n");
     NEW_Record:
     fflush(stdin);
-    printf("\n>> You have enter the Additional Mode\n\n");
     printf("Record ID, Item ID will be Auto Generated.\n");
     printf("\nFormat: Item Name | Price per quantity | Category | Quantity | Weight | Final Destination\n");
     printf("\nPlease Enter The Record Data : ");
-    scanf("%s%s%d%lf%s", Data.ItemName, &Data.price, Data.category, &Data.quantity, &Data.weight, Data.FinalDest);
-    Data.dev_stat[50] = "Storing";
-    Data.recip[50] = "Storage";
-    fflush(stdin);
+    scanf("%s%f%s%d%f%s", Data.ItemName, &Data.price, Data.category, &Data.quantity, &Data.weight, Data.FinalDest);
+    char johnny[] = "Storage";
+    strcat(Data.dev_stat, johnny);
+    strcat(Data.recip, johnny);
     WriteInFile(Data);
+    fflush(stdin);
     char choice;
     printf("\nWould you like to enter another data? ( Y / N ) : ");
     scanf("%c", &choice);
@@ -436,7 +437,7 @@ void cperm() {
       	printf("\nNo this User : %s", UN);
        	Sleep(5000);
        	goto STNP;
-	}
+	}    WriteInFile(Data);
 	fclose(search);
     printf("\nPlease enter the New permission for %s : ", UN);
     scanf("%s", PERM);
@@ -611,7 +612,6 @@ void sd() {
 };
 
 void buyanitem() {
-    money = 150;
     /*Var*/
     char buff[10240], *data_cmp, item_id[20], choice;
     search:
@@ -623,6 +623,9 @@ void buyanitem() {
     printf("You have enter Shopping Center. You can only buy the ITEM that store in Storage.\n");
     printf("\nPlease enter the Item ID of the Item : ");
     scanf("%s", item_id);
+    if(atoi(item_id) < 1000) {
+        goto ERR1;
+    }
     fflush(stdin);
     /*Check if the item exist*/
     FILE *fileIO = fopen("stock.txt", "r+");
@@ -632,6 +635,7 @@ void buyanitem() {
             return_vaule = 1;
         }
     }
+    ERR1:
     if(return_vaule != 1) {
         char choice;
         int h = 0, i = 0, j = 0, line[3];
@@ -713,7 +717,7 @@ void buyanitem() {
 	}
 	while(fgets(buff, sizeof(buff), fileIO) != NULL) {
 		if(x == init_price_line) {
-            rw(buff);
+            prw(buff);
 			priceCmp = atoi(buff);
 		}
 		x++;
@@ -735,11 +739,52 @@ void buyanitem() {
             pret();
         }
 	}
-	/* Change the Owner of the Item */
-
-
-
 	fclose(fileIO);
+	/* Replace the File POS */
+    FILE *org, *tmp;
+    int line, linectr = 0;
+    int value = atoi(item_id) - 1000;
+    char str[1024];
+    char tmpFile[] = "temp.txt";
+    char writtenLine[] = "Recipient: ";
+    org = fopen("stock.txt", "r");
+    tmp = fopen(tmpFile, "w");
+	strcat(writtenLine, username);
+    line = value + value * 11 + 8; //Find the REF. Line//
+    line++; //n + 1//
+    if (!tmp) {
+        fclose(org);
+        failure();
+    }
+    while (!feof(org)) {
+        strcpy(str, "\0");
+        fgets(str, 1024, org);
+        if (!feof(org)) {
+            linectr++;
+            if (linectr != line) {
+                fprintf(tmp, "%s", str);
+            } else {
+                fprintf(tmp, "%s\n", writtenLine);
+            }
+        }
+    }
+    fclose(org);
+    fclose(tmp);
+    if(remove("stock.txt") == 0) {
+        printf("\nItem is transferring to your username, < %s >", username);
+    } else {
+        system("del stock.txt");
+        system("rename stock.txt system.dll");
+        FILE *BDC = fopen("stock.txt", "r");
+        if(BDC != NULL) {
+            remove("stock.txt");
+            failure();
+        }
+    }
+    rename("temp.txt", "stock.txt");
+
+    money -= priceCmp;
+	pret();
 }
 
 /*Functions*/
@@ -768,15 +813,16 @@ void WriteInFile(struct Data dataIO) {
 
 	FILE *WriteIn = fopen("stock.txt", (((DataCheck() == 0) ? "w+" : "a+")));
 
+	float finalPrice = Data.price * Data.quantity;
     /* ---- WriteIn Started ----*/
     fprintf(WriteIn, "---Start of Record (%d)---\n", value);
     fprintf(WriteIn, "Record ID: %d\n", value);
     fprintf(WriteIn, "Item Name: %s\n", Data.ItemName);
     fprintf(WriteIn, "Item ID: %d\n", value);
-    fprintf(WriteIn, "Prices: %d\n", Data.price * Data.quantity);
+    fprintf(WriteIn, "Prices: %f\n", finalPrice);
     fprintf(WriteIn, "Catagory: %s\n", Data.category);
     fprintf(WriteIn, "Quantity: %d\n", Data.quantity);
-    fprintf(WriteIn, "Weight: %.3lf Kg\n", Data.weight);
+    fprintf(WriteIn, "Weight: %.3f Kg\n", Data.weight);
     fprintf(WriteIn, "Recipient: %s\n", Data.recip);
     fprintf(WriteIn, "Final Destination: %s\n", Data.FinalDest);
     fprintf(WriteIn, "Delivery Status: %s\n", Data.dev_stat);
@@ -801,7 +847,12 @@ void rw(char buf[]) {
 			buf[i] = ' ';
 		}
 	}
-	/* For replace "Prices :" -> "0" */
+}
+
+void prw(char buf[]) {
+	int i, length;
+	length = strlen(buf);
+    /* For replace "Prices :" -> "0" */
     for(i = 0; i < length; i++) {
 		if(buf[i] == 'P' || buf[i] == 'r' || buf[i] == 'i' || buf[i] == 'c' || buf[i] == 'e' || buf[i] == 's' || buf[i] == ':' || buf[i] == ' ') {
 			buf[i] = '0';
@@ -934,9 +985,9 @@ void startup() {
 	Sleep(500);
 
     /*Check "id.dat"*/
-    FILE *IDR = fopen("id.dat", "r+");
+    FILE *IDR = fopen("system\\id.dat", "r+");
     if(IDR == NULL) {
-        IDR = fopen("id.dat", "a");
+        IDR = fopen("system\\id.dat", "a");
         if(IDR == NULL) {
             return failure();
         }
