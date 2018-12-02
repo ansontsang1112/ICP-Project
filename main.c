@@ -39,6 +39,7 @@ void sd();
 void buyanitem();
 
 /*Functions*/
+void DisplayFile();
 int auth(char [], char []);
 void startup();
 void rw();
@@ -171,7 +172,7 @@ void menu() {
 
 /*Main Function*/
 int main(int argc, char **argv){
-	menu();
+	search();
 }
 
 void reg() {
@@ -332,11 +333,75 @@ void addition() {
 };
 
 void display() {
-
+    char option;
+    system("cls");
+    ini();
+    au_ini();
+    printf("Are you sure to display all items in our Stock System ? ( Y / N ) : ");
+    scanf("%c", &option);
+    fflush(stdin);
+    switch(option) {
+    case 'N':
+    case 'n':
+        printf("\nYou have selected 'N', you will be return back to GUI Panel ...");
+        Sleep(2000);
+        pret();
+    case 'Y':
+    case 'y':
+        printf("\nYou have selected 'Y', Loading Stock System ... Please wait ...");
+        Sleep(2000);
+        rev_value = 0; //0 = Return Back Display Sec. || 1 = Return back SRC
+        DisplayFile();
+    }
 };
 
 void search() {
-
+    char pcid, itemID[20], buff[10240];
+    int maxLoop = 12, dLine = 0, line[maxLoop], loop = 0, i = 0;
+    ini();
+    au_ini();
+    printf("You are going to search an item ...\n");
+    printf("\nDo you know the Product Code (Item ID) ? ( Y / N ): ");
+    scanf("%c", &pcid);
+    fflush(stdin);
+    if(pcid == 'N' || pcid == 'n') {
+        printf("\nRecords will be display ... Please wait ...");
+        rev_value = 1;
+        Sleep(3000);
+        DisplayFile();
+    }
+    EnterID:
+    printf("\nPlease enter the Item ID : ");
+    scanf("%s", itemID);
+    fflush(stdin);
+    if(atoi(itemID) < 1000) {
+        printf("\nUnexpected error : Wrong Input Data\n");
+        Sleep(2000);
+        goto EnterID;
+    }
+    int initLine = atoi(itemID) - 1000;
+    while(loop < maxLoop) {
+        line[loop] = loop + initLine * 11 + initLine;
+        loop++;
+    }
+    FILE *fileIO = fopen("stock.txt", "r");
+    while(fgets(buff, sizeof(buff), fileIO) != NULL) {
+        for(i = 0; i < maxLoop; i++) {
+            if(i == maxLoop) {
+                if(dLine == line[maxLoop]) {
+                    printf("%s\n", buff);
+                }
+            } else {
+                if(dLine == line[i]) {
+                    printf("%s", buff);
+                }
+            }
+        }
+        dLine++;
+    }
+    printf("\nThat is the result on ID = %s, Go back GUI Panel by typing 'ANY KEY'\n", itemID);
+    system("pause");
+    pret();
 };
 
 void modify() {
@@ -788,6 +853,81 @@ void buyanitem() {
 }
 
 /*Functions*/
+void DisplayFile() {
+    char message[10240], option;
+	int v1 = 0, v2 = 0, v3 = 0, v4 = 0, v5 = 0, v6 = 0, v7 = 0, v8 = 0, v9 = 0, v0 = 0, line[10];
+        line[0] = 1, line[1] = 2, line[2] = 3, line[3] = 4, line[4] = 5, line[5] = 6, line[6] = 7, line[7] = 8; line[8] = 9, line[9] = 10, line[10] = 11;
+	FILE *display = fopen("stock.txt", "r");
+	printf("\nThe product record has display below: \n", "stock.txt");
+	while(fgets(message, sizeof(message), display) != NULL) {
+        if(v1 == line[0]) {
+            /* Display Item Name*/
+            printf("\n%s", message);
+            line[0] += 11;
+        } if(v2 == line[1]) {
+            /* Display Item ID*/
+            printf("%s", message);
+            line[1] += 11;
+        } if(v3 == line[2]) {
+            printf("%s", message);
+            line[2] += 11;
+        } if(v4 == line[3]) {
+            printf("%s", message);
+            line[3] += 11;
+       } if(v5 == line[4]) {
+            printf("%s", message);
+            line[4] += 11;
+       } if(v6 == line[5]) {
+            printf("%s", message);
+            line[5] += 11;
+        } if(v7 == line[6]) {
+            printf("%s", message);
+            line[6] += 11;
+        } if(v8 == line[7]) {
+            printf("%s", message);
+            line[7] += 11;
+        } if(v9 == line[8]) {
+            printf("%s", message);
+            line[8] += 11;
+        } if(v0 == line[9]) {
+            printf("%s", message);
+            line[9] += 11;
+        } else {
+            v1++;
+            v2++;
+            v3++;
+            v4++;
+            v5++;
+            v6++;
+            v7++;
+            v8++;
+            v9++;
+            v0++;
+        }
+    }
+	fclose(display);
+	CONFIRM:
+	printf("\nIt's that contain any problem ? If not, please type < k > to go back : ");
+	scanf("%c", &option);
+	fflush(stdin);
+	if(option != 'k' && option != 'K') {
+        printf("\nOption < %c > rejected ....\n", option);
+        Sleep(2000);
+        goto CONFIRM;
+	}
+	printf("\nConfirmation Accepted ! Please wait ...");
+	Sleep(3000);
+	if(rev_value == 0) {
+        pret();
+	} if(rev_value == 1) {
+	    search();
+	} if(rev_value != 0 || rev_value != 1) {
+	    printf("\nR_Value get error ... System Failure ...");
+	    Sleep(2000);
+	    failure();
+	}
+}
+
 int DataCheck() {
     char TPI[20];
     int return_value;
