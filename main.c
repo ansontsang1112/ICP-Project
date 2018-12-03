@@ -172,7 +172,7 @@ void menu() {
 
 /*Main Function*/
 int main(int argc, char **argv){
-	search();
+	menu();
 }
 
 void reg() {
@@ -337,6 +337,7 @@ void display() {
     system("cls");
     ini();
     au_ini();
+    fflush(stdin);
     printf("Are you sure to display all items in our Stock System ? ( Y / N ) : ");
     scanf("%c", &option);
     fflush(stdin);
@@ -356,10 +357,12 @@ void display() {
 };
 
 void search() {
+    system("cls");
     char pcid, itemID[20], buff[10240];
     int maxLoop = 12, dLine = 0, line[maxLoop], loop = 0, i = 0;
     ini();
     au_ini();
+    fflush(stdin);
     printf("You are going to search an item ...\n");
     printf("\nDo you know the Product Code (Item ID) ? ( Y / N ): ");
     scanf("%c", &pcid);
@@ -432,7 +435,7 @@ void cpwd() {
     fflush(stdin);
     scanf("%s", PW);
     if(auth(username, PW) == 0) {
-    	printf("\n Authorization Sucess: \n\n");
+    	printf("\n Authorization Success: \n\n");
     	PwTypo:
     	printf("Please Enter the New Password: ");
     	fflush(stdin);
@@ -440,7 +443,9 @@ void cpwd() {
     	printf("\nPlease Enter it again: ");
     	scanf("%s", CNP);
     	if(strcmp(NPWD, CNP) != 0) {
+            system("cls");
     		ini();
+    		au_ini();
     		printf("You are required to Enter Again.\n\n");
     		printf("Please wait in few second\n");
 			Sleep(2000);
@@ -452,11 +457,11 @@ void cpwd() {
 		counter += 1;
 		return cpwd();
 	}
-	/*Write in "pwd.dat"*/
+
 	char path[] = "userdata\\", pwdfile[] = "\\password.dat";
 	strcat(path, username);
 	strcat(path, pwdfile);
-	FILE *PWD = fopen(path, "w");
+	FILE *PWD = fopen(path, "w+");
 	fprintf(PWD, "%s", NPWD);
 	fclose(PWD);
 	printf("\nPassword Successfully Changed, Return in 5 seconds");
