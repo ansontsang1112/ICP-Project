@@ -461,7 +461,7 @@ void cpwd() {
 	char path[] = "userdata\\", pwdfile[] = "\\password.dat";
 	strcat(path, username);
 	strcat(path, pwdfile);
-	FILE *PWD = fopen(path, "w+");
+	FILE *PWD = fopen(path, "w");
 	fprintf(PWD, "%s", NPWD);
 	fclose(PWD);
 	printf("\nPassword Successfully Changed, Return in 5 seconds");
