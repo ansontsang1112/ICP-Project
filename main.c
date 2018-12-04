@@ -21,9 +21,6 @@ void SAPanel();
 void choices();
 void CustomerPanel();
 
-/*User Login & Registation Functions*/
-void reg();
-
 /*Functions*/
 void addition();
 void display();
@@ -41,6 +38,7 @@ void buyanitem();
 /*Functions*/
 void logData(int, int);
 void DisplayFile();
+void modifyARecord(int, int, char[]);
 void deleteARecord();
 int auth(char [], char []);
 int nullDetecter(int);
@@ -92,6 +90,7 @@ void menu() {
     }
 	startup();
 	getConfig();
+	logData(0,99);
 	SKIPUP:
 	system("title HKUSPACE IMRS @ LOG-IN Menu");
     char ch1 = 'C';
@@ -126,9 +125,6 @@ void menu() {
 	printf("Please Enter your Username & Password. If you do not have an account, please enter 'REGISTER' to get an account.");
 	printf("\n\nUsername : ");
 	scanf("%s", username);
-	if(username == "REGISTER") {
-		return reg();
-	}
 	printf("\nPassword : ");
 	scanf("%s", password);
 	if(auth(username, password) != 0) {
@@ -183,12 +179,8 @@ void menu() {
 
 /*Main Function*/
 int main(int argc, char **argv){
-	menu();
+	modify();
 }
-
-void reg() {
-
-};
 
 /*Customer Panel & System / Shop Admin. Menu*/
 void SysPanel() {
@@ -324,7 +316,7 @@ void addition() {
     NEW_Record:
     fflush(stdin);
     printf("Record ID, Item ID will be Auto Generated.\n");
-    printf("\nFormat: Item Name | Price per quantity | Category | Quantity | Weight | Final Destination\n");
+    printf("\nFormat: Item Name | Price per quantity | Category | Quantity | Weight per quantity | Final Destination\n");
     printf("\nPlease Enter The Record Data : ");
     scanf("%s%f%s%d%f%s", Data.ItemName, &Data.price, Data.category, &Data.quantity, &Data.weight, Data.FinalDest);
     char storage[] = "Storage";
@@ -432,7 +424,93 @@ void search() {
 };
 
 void modify() {
-
+    int modValue = 0, return_vaule = -1;
+    char str[102400], buff[102400], choice, itemID[20], infoChanges[1024], aChoice;
+    system("cls");
+    ini();
+    au_ini();
+    printf("Hello, You are going to Modify a record. Do you know the Item ID of that Item ? ( Y / N ) : ");
+    scanf("%c", &choice);
+    fflush(stdin);
+    if(choice != 'Y' && choice != 'y') {
+        printf("\nRedirecting : Stock Display System.\n");
+        printf("\nPlease Wait ...");
+        Sleep(3000);
+        rev_value = 2;
+        DisplayFile();
+    }
+    IDENTRY:
+    printf("\nPlease enter the relevant Item ID : ");
+    scanf("%s", itemID);
+    fflush(stdin);
+    FILE *searchUX = fopen("stock.txt", "r+");
+    while(fscanf(searchUX, "%s", buff) != EOF) {
+        if(strcmp(itemID, buff) == 0) {
+            fflush(stdout);
+            return_vaule = 0;
+        }
+    }
+    fclose(searchUX);
+    if(return_vaule != 0) {
+        char eChoice;
+        printf("\nSorry, we cannot find the Item in our Stock System. Would you like to try again ? ( Y / N ) : ");
+        scanf("%c", &eChoice);
+        if(eChoice != 'y' && eChoice != 'Y') {
+            printf("\nRedirecting : Shop / System Panel");
+            Sleep(3000);
+            pret();
+        }
+        fflush(stdin);
+        Sleep(1000);
+        goto IDENTRY;
+    }
+    system("cls");
+    ini();
+    au_ini();
+    int refItemID = atoi(itemID);
+    printf("The record you are handling is %s\n", itemID);
+    printf("\nPlease select the relevant data entry : ");
+    printf("\nA: Item Name\n");
+    printf("B: Category\n");
+    printf("C: Final Destination\n");
+    printf("D: Delivery Status\n\n");
+    printf("Please enter the relevant alphabetic number : ");
+    scanf("%c", &aChoice);
+    fflush(stdin);
+    switch(aChoice) {
+    case 'A':
+    case 'a':
+        printf("\nYou have selected to change the Item Name of Item ID = %d\n", refItemID);
+        printf("\nPlease enter the the Item Name that you wise to change : ");
+        scanf("%s", infoChanges);
+        fflush(stdin);
+        modifyARecord(0, refItemID, infoChanges);
+        break;
+    case 'B':
+    case 'b':
+        printf("\nYou have selected to change the Category of Item ID = %d\n", refItemID);
+        printf("\nPlease enter the the Category that you wise to change : ");
+        scanf("%s", infoChanges);
+        fflush(stdin);
+        modifyARecord(1, refItemID, infoChanges);
+        break;
+    case 'C':
+    case 'c':
+        printf("\nYou have selected to change the Final Destination of Item ID = %d\n", refItemID);
+        printf("\nPlease enter the the Final Destination that you wise to change : ");
+        scanf("%s", infoChanges);
+        fflush(stdin);
+        modifyARecord(2, refItemID, infoChanges);
+        break;
+    case 'D':
+    case 'd':
+        printf("\nYou have selected to change the Delivery Status of Item ID = %d\n", refItemID);
+        printf("\nPlease enter the the Delivery Status that you wise to change : ");
+        scanf("%s", infoChanges);
+        fflush(stdin);
+        modifyARecord(3, refItemID, infoChanges);
+        break;
+    }
 };
 
 void del() {
@@ -741,7 +819,7 @@ void sd() {
 
 void buyanitem() {
     /*Var*/
-    char buff[10240], *data_cmp, item_id[20], choice;
+    char buff[102400], *data_cmp, item_id[20], choice;
     search:
     printf("");
     int return_vaule = 0;
@@ -881,8 +959,8 @@ void buyanitem() {
     FILE *org, *tmp;
     int line, linectr = 0;
     int value = atoi(item_id) - 1000;
-    char str[1024];
-    char tmpFile[] = "temp.txt";
+    char str[102400];
+    char tmpFile[] = "temp.dat";
     char writtenLine[] = "Recipient: ";
     org = fopen("stock.txt", "r");
     tmp = fopen(tmpFile, "w");
@@ -908,7 +986,7 @@ void buyanitem() {
     fclose(org);
     fclose(tmp);
     remove("stock.txt");
-    rename("temp.txt", "stock.txt");
+    rename("temp.dat", "stock.txt");
 
     logData(atoi(item_id), 8);
 
@@ -953,6 +1031,13 @@ void logData(int itemID, int modType) {
         fprintf(logIO, "\n[%s] [%s] : User, < %s > have disabled maintain mode.", __DATE__, __TIME__, username);
     } if(modType == 8) {
         fprintf(logIO, "\n[%s] [%s] : User, < %s > have buy / transfer an Item. (Item Number = %d).", __DATE__, __TIME__, username, itemID);
+    }
+
+    if(modType == 99) {
+        fprintf(logIO, "\n[%s] [%s] : HKUSpace IMRS Successfully Loaded at %s.", __DATE__, __TIME__, __TIME__);
+    }
+    if(modType == 100) {
+        fprintf(logIO, "\n[%s] [%s] : Failure Detected in %s.", __DATE__, __TIME__, __FILE__);
     }
     fclose(logIO);
 };
@@ -1041,15 +1126,74 @@ void DisplayFile() {
         pret();
 	} if(rev_value == 1) {
 	    search();
-	} if(rev_value == 3) {
+	} if(rev_value == 2) {
+	    modify();
+	}
+    if(rev_value == 3) {
 	    del();
 	}
-	if (rev_value != 0 || rev_value != 1 || rev_value != 3) {
+	if (rev_value != 0 || rev_value != 1 || rev_value != 2 || rev_value != 3) {
 	    printf("\nR_Value get error ... System Failure ...");
 	    Sleep(2000);
 	    failure();
 	}
 }
+
+void modifyARecord(int choiceRef, int itemID, char changeDetail[]) {
+    /* Choose which line need to be replace */
+    FILE *org, *tmp;
+    int line, linectr = 0;
+    int calcItemID = itemID - 1000;
+    char str[102400];
+    char cIN[] = "Item Name: ", cCG[] = "Catagory: ", cFD[] = "Final Destination: ", cDS[] = "Delivery Status: ", writtenIN[50] = "";
+    org = fopen("stock.txt", "r");
+    tmp = fopen("tmp.dat", "w");
+    if(choiceRef == 0) {
+        line = calcItemID + calcItemID * 11 + 2; //Item ID
+        rw(changeDetail);
+        strcat(cIN, changeDetail);
+        strcpy(writtenIN, cIN);
+    } if(choiceRef == 1) {
+        line = calcItemID + calcItemID * 11 + 5;
+        rw(changeDetail);
+        strcat(cCG, changeDetail);
+        strcpy(writtenIN, cCG);
+    } if(choiceRef == 2) {
+        line = calcItemID + calcItemID * 11 + 9;
+        strcat(cFD, changeDetail);
+        strcpy(writtenIN, cFD);
+    } if(choiceRef == 3) {
+        line = calcItemID + calcItemID * 11 + 10;
+        strcat(cDS, changeDetail);
+        strcpy(writtenIN, cDS);
+    } if(choiceRef > 3 || choiceRef < 0) {
+        failure();
+    }
+    line++;
+    if(!tmp) {
+        fclose(org);
+        failure();
+    }
+    while(!feof(org)) {
+        strcpy(str, "\0");
+        fgets(str, sizeof(str), org);
+        if(!feof(org)) {
+            linectr++;
+            if(linectr != line) {
+                fprintf(tmp, "%s", str);
+            } else {
+                fprintf(tmp, "%s\n", writtenIN);
+            }
+        }
+    }
+    fclose(org);
+    fclose(tmp);
+    //remove("stock.txt");
+    //rename("tmp.dat", "stock.txt");
+    printf("\nData Successfully Modified. Redirecting ... Please Wait ...");
+    Sleep(3000);
+    pret();
+};
 
 int DataCheck() {
     char TPI[20];
@@ -1077,15 +1221,16 @@ void WriteInFile(struct Data dataIO) {
 	FILE *WriteIn = fopen("stock.txt", (((DataCheck() == 0) ? "w+" : "a+")));
 
 	float finalPrice = Data.price * Data.quantity;
+	float actualWeight = Data.weight * Data.quantity;
     /* ---- WriteIn Started ----*/
     fprintf(WriteIn, "---Start of Record (%d)---\n", value);
     fprintf(WriteIn, "Record ID: %d\n", value);
     fprintf(WriteIn, "Item Name: %s\n", Data.ItemName);
     fprintf(WriteIn, "Item ID: %d\n", value);
-    fprintf(WriteIn, "Prices: %f\n", finalPrice);
+    fprintf(WriteIn, "Prices: %.2f\n", finalPrice);
     fprintf(WriteIn, "Catagory: %s\n", Data.category);
     fprintf(WriteIn, "Quantity: %d\n", Data.quantity);
-    fprintf(WriteIn, "Weight: %.3f Kg\n", Data.weight);
+    fprintf(WriteIn, "Weight: %.2f Kg\n", actualWeight);
     fprintf(WriteIn, "Recipient: %s\n", Data.recip);
     fprintf(WriteIn, "Final Destination: %s\n", Data.FinalDest);
     fprintf(WriteIn, "Delivery Status: %s\n", Data.dev_stat);
@@ -1367,6 +1512,7 @@ void failure() {
     extern int errno;
 	system("CLS");
 	ini();
+	logData(0, 100);
 	printf("\t\n***   System Failure   ***\n");
 	printf("Value of Error: %d\n", errno);
 	printf("Reason : %s\n\n", strerror(errno));
