@@ -14,7 +14,7 @@ int main()
 {
 	FILE *data, *cdata;
 	int replace_line, linectr = 0, showlinctr = 0, i, ID;
-	char str[999], showstr[999];
+	char str[10240], showstr[10240];
 	char yn;
 	
 	data = fopen("stock.txt" ,"r");
@@ -29,7 +29,18 @@ int main()
 		return 0;
 	}
 	
-	do{
+	printf("Please ether the ID for delete:");
+	fflush(stdin);
+	scanf("%d", &ID);
+		
+	replace_line = ((ID - 1000) * 12) + 1;
+	replace_line++;
+		
+	printf("\nIt is %d that you need to delete (Y/N):", ID);
+	fflush(stdin);
+	scanf("%c", &yn);
+	
+	if(yn != 'Y' || yn != 'y'){
 		printf("Please ether the ID for delete:");
 		fflush(stdin);
 		scanf("%d", &ID);
@@ -40,13 +51,13 @@ int main()
 		printf("\nIt is %d that you need to delete (Y/N):", ID);
 		fflush(stdin);
 		scanf("%c", &yn);
-	}while(yn != 'Y');
+	}
 
-	char space[] = "---------------------";
+	char space[] = "----NULL----";
 	
 	while(!feof(data)){
 		strcpy(str, "\0");
-		fgets(str, 999, data);
+		fgets(str, 10240, data);
 		if(!feof(data)){
 			linectr++;
 			if(linectr != replace_line && linectr != replace_line + 1 && linectr != replace_line + 2 && linectr != replace_line + 3 && linectr != replace_line + 4 && linectr != replace_line + 5 && linectr != replace_line + 6 && linectr != replace_line + 7 && linectr != replace_line + 8 && linectr != replace_line + 9){
@@ -61,7 +72,7 @@ int main()
 	fclose(data);
 	fclose(cdata);
 	remove("stock.txt");
-	rename("nstock.txt", "abc.txt");
+	rename("nstock.txt", "stock.txt");
 	
 	printf("\nThe date of %d had been removed....", ID);
 	
