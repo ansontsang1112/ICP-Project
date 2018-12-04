@@ -1,65 +1,90 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <conio.h>
 /* Data modify*/
 
 int main()
 {
-	char store[10000];
-	int record_id_ans, record_no_ans;
-	char ans[1024];
-	int n1 = 0, n2 = 0, n3 = 0, n4 = 0, n5 = 0, n6 = 0, n7 = 0, n8 = 0, n9 = 0, n10 = 0, line[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10}; 
-	FILE *modify = fopen("stock.txt", "w");
+	int record_id_ans, line_num, j = 0;
+//	int modifynum;
+//	char item, cata, delivery;
+//	float price;
+	char str[1000]; 
+	FILE *modify;
+    FILE *cmodify;
+    modify = fopen("stock.txt", "r");
+    cmodify = fopen("cstock.txt", "w");
+    
 	enterRecord:
 	printf("Please input the record ID: ");
 	scanf("%d", &record_id_ans);
 	fflush(stdin);
 	
 	/* Input checking */
-	while(record_id_ans < 1000){
-		printf("Invaild input. Please input again!");
-		Sleep(1000);
+	if(record_id_ans < 1000){
+		printf("Input valid too small. Please input again!");
+		Sleep(1500);
 		system("cls");
 		goto enterRecord;}
+		else if(record_id_ans > 10000){
+			printf("Input valid too large. Please input again!");
+			Sleep(1500);
+			system("cls");
+			goto enterRecord;}
+		
+	line_num = ((record_id_ans - 1000) * 12) + 1;
+	line_num++;
 	
-	record_id_ans = atoi(record_id_ans);
-	record_no_ans = (record_id_ans - 1000) * 12 + 1;
-	while(fgets(ans, sizeof(ans), modify) != NULL){
-		printf("Data from the file:\n");
-				  if(n1 == line[0]) {
-                    /* Display Item Name*/
-                    printf("\n%s", store);
-                } if(n2 == line[1]) {
-                    /* Display Item ID*/
-                    printf("%s", store);
-                } if(n3 == line[2]) {
-                	/* Display Item ID*/
-                    printf("%s", store);
-                } if(n4 == line[3]) {
-                	/* Display Item ID*/
-                    printf("%s", store);
-                } if(n5 == line[4]) {
-                	/* Display Item ID*/
-                    printf("%s", store);
-                } if(n6 == line[5]) {
-                	/* Display Item ID*/
-                    printf("%s", store);
-                } if(n7 == line[6]) {
-                	/* Display Item ID*/
-                    printf("%s", store);
-                } if(n8 == line[7]) {
-                	/* Display Item ID*/
-                    printf("%s", store);
-                } if(n9 == line[8]) {
-                	/* Display Item ID*/
-                    printf("%s", store);
-                } if(n10 == line[9]) {
-                	/* Display Item ID*/
-                    printf("%s", store);
-	printf("You are allow to modify the content of 'Item name', 'Price', 'Catagory', 'Delivery Status'!");
-	}
+	while (!feof(modify))
+        {
+        	strcpy(str, "\0");
+        	fgets(str, 1000, modify);
+            if (!feof(modify))
+            {
+                j++;
+                if(j == line_num && j == line_num + 1 && j == line_num + 2 && j == line_num + 3 && j == line_num + 4 && j == line_num + 5 && j == line_num + 6 && j == line_num + 7 && j == line_num + 8 && j == line_num + 9)
+                {	printf("%s\n", str);}
+            }
+
+	
+	/* Tell user which function they can use */
+/*	printf("You are allowed to modify the content of 'Item name', 'Price', 'Catagory', 'Delivery Status'!");
+	enterans:
+	printf("\nModify 'Item name' press<1>, 'Price' press<2>, 'Catagory' press<3>, 'Delivery Status' press<4>: ");
+	scanf("%d", &modifynum);
+	
+	// Data validation
+	if(modifynum != 1 || modifynum != 2 || modifynum != 3 || modifynum != 4){
+		printf("Incorrect input. Please input again!");
+		Sleep(1500);
+		system("cls");
+		goto enterans;}	
+		else if(modifynum == 1){
+			printf("Item name: ");
+        	fflush(stdin);
+        	scanf("%d", &item);
+        	fprintf(cmodify, "%d\n", item);}
+        	else if(modifynum == 2){
+					printf("Prices: ");
+        			fflush(stdin);
+        			scanf("%d", &price);
+        			fprintf(cmodify, "%d\n", price);}
+        		else if(modifynum == 3){
+						printf("Catagory: ");
+        				fflush(stdin);
+        				scanf("%d", &cata);
+        				fprintf(cmodify, "%d\n", cata);}
+        			else if(modifynum == 1){
+							printf("Delivery Status: ");
+        					fflush(stdin);
+        					scanf("%d", &item);
+        					fprintf(cmodify, "%d\n", delivery);}
+    	 
+*/	
+
     fclose(modify);
-	getch();
+/*	remove("stock.txt");
+	rename("cstock.txt", "stock.txt");*/
 	return 0;
-}
 }
