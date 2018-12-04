@@ -129,6 +129,7 @@ void menu() {
 	scanf("%s", password);
 	if(auth(username, password) != 0) {
 		printf("\nAuthorization Failure, Please wait for 3 sec. to return LOG-IN Platform.");
+		logData(-1000, -3);
 		counter++;
 		Sleep(3000);
 		goto MENU;
@@ -179,7 +180,7 @@ void menu() {
 
 /*Main Function*/
 int main(int argc, char **argv){
-	modify();
+	menu();
 }
 
 /*Customer Panel & System / Shop Admin. Menu*/
@@ -312,6 +313,7 @@ void choices(int type) {
 void addition() {
     system("cls");
     ini();
+    au_ini();
     printf("\n>> You have enter the Additional Mode\n\n");
     NEW_Record:
     fflush(stdin);
@@ -320,14 +322,19 @@ void addition() {
     printf("\nPlease Enter The Record Data : ");
     scanf("%s%f%s%d%f%s", Data.ItemName, &Data.price, Data.category, &Data.quantity, &Data.weight, Data.FinalDest);
     char storage[] = "Storage";
-    strcat(Data.dev_stat, storage);
-    strcat(Data.recip, storage);
+    if(strcmp(Data.dev_stat, storage) != 0 && strcmp(Data.recip, storage) != 0) {
+        strcat(Data.dev_stat, storage);
+        strcat(Data.recip, storage);
+    }
     WriteInFile(Data);
     fflush(stdin);
     char choice;
     printf("\nWould you like to enter another data? ( Y / N ) : ");
     scanf("%c", &choice);
     if(choice == 'y' || choice == 'Y') {
+        system("cls");
+        ini();
+        au_ini();
         goto NEW_Record;
     } else {
         printf("\nYour Record are writing to file, please wait ...");
@@ -366,7 +373,7 @@ void display() {
 void search() {
     system("cls");
     char pcid, itemID[20], buff[10240];
-    int maxLoop = 12, dLine = 0, line[maxLoop], loop = 0, i = 0;
+    int maxLoop = 12, dLine = 0, line[maxLoop], loop = 0, i = 0, return_vaule = -1;
     ini();
     au_ini();
     fflush(stdin);
@@ -386,6 +393,19 @@ void search() {
     fflush(stdin);
     if(atoi(itemID) < 1000) {
         printf("\nUnexpected error : Wrong Input Data\n");
+        Sleep(2000);
+        goto EnterID;
+    }
+    FILE *searchUX = fopen("stock.txt", "r+");
+    while(fscanf(searchUX, "%s", buff) != EOF) {
+        if(strcmp(itemID, buff) == 0) {
+            fflush(stdout);
+            return_vaule = 0;
+        }
+    }
+    if(return_vaule != 0) {
+        printf("\nWe cannot find the record %s\n", itemID);
+        printf("\nRedirecting ... Enter ID\n");
         Sleep(2000);
         goto EnterID;
     }
@@ -429,6 +449,7 @@ void modify() {
     system("cls");
     ini();
     au_ini();
+    fflush(stdin);
     printf("Hello, You are going to Modify a record. Do you know the Item ID of that Item ? ( Y / N ) : ");
     scanf("%c", &choice);
     fflush(stdin);
@@ -898,7 +919,7 @@ void buyanitem() {
     if(init_value == 0) {
         init_line = 0;
     } else {
-        init_line = init_value + init_value * 11 - 1;
+        init_line = init_value + init_value * 11;
     }
     int term_line = init_line + 11;
     while(fgets(buff, sizeof(buff), search2) != NULL) {
@@ -1009,7 +1030,9 @@ void buyanitem() {
 void logData(int itemID, int modType) {
     char logFile[] = "system\\record.log";
     FILE *logIO = fopen(logFile, (((DataCheck() == 0) ? "w+" : "a+")));
-    if(modType == -2) {
+    if(modType == -3) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > failure to Log in HKUSpace IRMS.", __DATE__, __TIME__, username);
+    } if(modType == -2) {
         fprintf(logIO, "\n[%s] [%s] : User, < %s > have Logged out HKUSpace IRMS.", __DATE__, __TIME__, username);
     } if(modType == -1) {
         fprintf(logIO, "\n[%s] [%s] : User, < %s > have Logged in HKUSpace IRMS.", __DATE__, __TIME__, username);
@@ -1031,6 +1054,8 @@ void logData(int itemID, int modType) {
         fprintf(logIO, "\n[%s] [%s] : User, < %s > have disabled maintain mode.", __DATE__, __TIME__, username);
     } if(modType == 8) {
         fprintf(logIO, "\n[%s] [%s] : User, < %s > have buy / transfer an Item. (Item Number = %d).", __DATE__, __TIME__, username, itemID);
+    } if(modType == 9) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > have modify an Item. (Item Number = %d).", __DATE__, __TIME__, username, itemID);
     }
 
     if(modType == 99) {
@@ -1188,8 +1213,10 @@ void modifyARecord(int choiceRef, int itemID, char changeDetail[]) {
     }
     fclose(org);
     fclose(tmp);
-    //remove("stock.txt");
-    //rename("tmp.dat", "stock.txt");
+
+    remove("stock.txt");
+    rename("tmp.dat", "stock.txt");
+    logData(itemID, 9);
     printf("\nData Successfully Modified. Redirecting ... Please Wait ...");
     Sleep(3000);
     pret();
@@ -1241,14 +1268,15 @@ void WriteInFile(struct Data dataIO) {
     FILE *ID = fopen(PATH, "r");
     value = getw(ID);
     ID = fopen(PATH, "w");
-    logData(ID, 0);
+    logData(value, 0);
     value++;
     putw(value, ID);
 	fclose(ID);
 };
 
 void deleteARecord() {
-	int deleteLine, linectr = 0, showlinctr = 0, i, itemID;
+	int deleteLine, linectr = 0, showlinctr = 0, i, itemID, return_value;
+	char itemIOCheckID[50], buff[102400];
 	char str[10240], showstr[10240];
 	char choice;
 
@@ -1261,7 +1289,24 @@ void deleteARecord() {
 	INPUT:
 	printf("Please ether the ID for delete: ");
 	fflush(stdin);
-	scanf("%d", &itemID);
+	scanf("%s", itemIOCheckID);
+
+	/* Check if the Item Exist */
+    FILE *searchUX = fopen("stock.txt", "r+");
+    while(fscanf(searchUX, "%s", buff) != EOF) {
+        if(strcmp(itemID, buff) == 0) {
+            fflush(stdout);
+            return_value = 0;
+        }
+    }
+
+    if(return_value != 0) {
+        printf("\nItem ID : %s is not exist ... redirecting", itemIOCheckID);
+        Sleep(3000);
+        deleteARecord();
+    }
+
+    itemID = atoi(itemIOCheckID);
 
 	/* NULL CHECKER */
     if(nullDetecter(itemID) == 0) {
@@ -1271,12 +1316,26 @@ void deleteARecord() {
     }
 	deleteLine = ((itemID - 1000) * 12) + 1;
 	deleteLine++;
+
+	/* UI - DELETE*/
+	system("cls");
+	ini();
+	au_ini();
+	printf("You are now selected ITEM ID = %d\n", itemID);
 	printf("\nIs that < ID = %d > that you need to delete ? ( Y / N ) : ", itemID);
 	fflush(stdin);
 	scanf("%c", &choice);
 
 	if(choice != 'Y' && choice != 'y') {
         goto INPUT;
+	}
+	fflush(stdin);
+	printf("\nAre you Sure to delete the record ? ( Y / N ) : ");
+	fflush(stdin);
+	scanf("%c", &choice);
+	if(choice != 'y' && choice != 'Y') {
+        printf("Redirecting : Panel");
+        printf("Reason : Rejected to Accept - Deleting Record %d", itemID);
 	}
 
 	logData(itemID ,3);
