@@ -39,9 +39,11 @@ void sd();
 void buyanitem();
 
 /*Functions*/
+void logData(int, int);
 void DisplayFile();
 void deleteARecord();
 int auth(char [], char []);
+int nullDetecter(int);
 void startup();
 void rw();
 void WriteInFile();
@@ -65,7 +67,7 @@ struct Data {
 }Data;
 
 /*Globes Var*/
-int counter = 0, role = 0, rev_value = 0, maintain, tmd, permission, money;
+int counter = 0, role = 0, rev_value = 0, maintain, tmd, permission, money, logTypo = -1;
 char appear;
 char Normal[] = "Please enter the password", LIF[] = "Authorization Failure, Please try again.";
 char username[50], password[50];
@@ -154,6 +156,9 @@ void menu() {
 	char Pcoden = fgetc(getPerm);
 	permission = atoi(&Pcoden);
 	fclose(getPerm);
+
+	logData(-1000, -1);
+
 	if(permission == 0) {
 	    printf("\nYou are belongs to >> SYS. Admin. Redirecting to Relative GUI Panel ...\n");
 	    Sleep(2000);
@@ -360,6 +365,7 @@ void display() {
         printf("\nYou have selected 'Y', Loading Stock System ... Please wait ...");
         Sleep(2000);
         rev_value = 0; //0 = Return Back Display Sec. || 1 = Return back SRC
+        logData(-1000, 1);
         DisplayFile();
     }
 };
@@ -390,6 +396,13 @@ void search() {
         Sleep(2000);
         goto EnterID;
     }
+    /* NULL CHECKER */
+    if(nullDetecter(atoi(itemID)) == 0) {
+        printf("\nError : ItemID < %s > was deleted! Please retry another ItemID later ...\n", itemID);
+        Sleep(3000);
+        goto EnterID;
+    }
+
     int initLine = atoi(itemID) - 1000;
     while(loop < maxLoop) {
         line[loop] = loop + initLine * 11 + initLine;
@@ -410,6 +423,7 @@ void search() {
         }
         dLine++;
     }
+    logData(atoi(itemID), 2);
     printf("\nThat is the result on ID = %s, Go back GUI Panel by typing 'ANY KEY'\n", itemID);
     fclose(fileIO);
     system("pause");
@@ -496,6 +510,8 @@ void cpwd() {
 		return cpwd();
 	}
 
+	logData(-1000, 4);
+
 	char path[] = "userdata\\", pwdfile[] = "\\password.dat";
 	strcat(path, username);
 	strcat(path, pwdfile);
@@ -579,6 +595,7 @@ void emm() {
                 fprintf(maintain, "%d", index);
                 fclose(maintain);
                 printf("\nMaintain Mode is Successfully enabled. To prevent error in IRMS, the program will auto restart in 5 seconds.");
+                logData(-1000, 6);
                 Sleep(5000);
                 system("cls");
                 return menu();
@@ -645,6 +662,7 @@ void emm() {
                 fprintf(maintain, "%d", rev_index);
                 fclose(maintain);
                 printf("\nMaintain Mode is Successfully disabled. To prevent error in IRMS, the program will auto restart in 5 seconds.");
+                logData(-1000, 7);
                 Sleep(5000);
                 system("cls");
                 return menu();
@@ -726,6 +744,7 @@ void buyanitem() {
     search:
     printf("");
     int return_vaule = 0;
+    EnterID:
     system("cls");
     ini();
     au_ini();
@@ -743,6 +762,11 @@ void buyanitem() {
             fflush(stdout);
             return_vaule = 1;
         }
+    }
+    if(nullDetecter(atoi(item_id) == 0)) {
+        printf("\nError : ItemID < %s > was deleted! Please retry another ItemID later ...\n", item_id);
+        Sleep(3000);
+        goto EnterID;
     }
     fclose(searchIO);
     ERR1:
@@ -884,6 +908,9 @@ void buyanitem() {
     fclose(tmp);
     remove("stock.txt");
     rename("temp.txt", "stock.txt");
+
+    logData(atoi(item_id), 8);
+
     /* Deduct Money from Money System */
     int orgMoney;
     char path[] = "userdata\\", file[] = "\\money.dat";
@@ -900,6 +927,48 @@ void buyanitem() {
 }
 
 /*Functions*/
+void logData(int itemID, int modType) {
+    char logFile[] = "system\\record.log";
+    FILE *logIO = fopen(logFile, (((DataCheck() == 0) ? "w+" : "a+")));
+    if(modType == -1) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > have Logged in HKUSpace IRMS.", __DATE__, __TIME__, username);
+    } if(modType == 0) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > have added a record. (Item Number = %d)", __DATE__, __TIME__, username, itemID);
+    } if(modType == 1) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > have displayed all records", __DATE__, __TIME__, username);
+    } if(modType == 2) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > have searched record. (Item Number = %d)", __DATE__, __TIME__, username, itemID);
+    } if(modType == 3) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > have deleted record. (Item Number = %d)", __DATE__, __TIME__, username, itemID);
+    } if(modType == 4) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > have changed his / her password.", __DATE__, __TIME__, username);
+    } if(modType == 5) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > have changed someone's permission.", __DATE__, __TIME__, username);
+    } if(modType == 6) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > have enabled maintain mode.", __DATE__, __TIME__, username);
+    } if(modType == 7) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > have disabled maintain mode.", __DATE__, __TIME__, username);
+    } if(modType == 8) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > have buy / transfer an Item. (Item Number = %d).", __DATE__, __TIME__, username, itemID);
+    }
+};
+
+int nullDetecter(int itemID) {
+    char str[102400], rec[102400], nullPointer[] = "----NULL----";
+    int line = 0;
+    int cRoot = itemID - 1000, finalValue = cRoot * 11 + cRoot + 1; /* Check IF Line + 2 contain ----NULL---- */
+    FILE *fileIO = fopen("stock.txt", "r+");
+    while(fgets(str, sizeof(str), fileIO) != NULL) {
+        if(line == finalValue) {
+            strcpy(rec ,str);
+        }
+        line++;
+    }
+    fclose(fileIO);
+    int returnValue = strncmp(rec, nullPointer,12);
+    return returnValue;
+}
+
 void DisplayFile() {
     char message[10240], option;
 	int v1 = 0, v2 = 0, v3 = 0, v4 = 0, v5 = 0, v6 = 0, v7 = 0, v8 = 0, v9 = 0, v0 = 0, line[10];
@@ -1023,6 +1092,7 @@ void WriteInFile(struct Data dataIO) {
     FILE *ID = fopen(PATH, "r");
     value = getw(ID);
     ID = fopen(PATH, "w");
+    logData(ID, 0);
     value++;
     putw(value, ID);
 	fclose(ID);
@@ -1044,9 +1114,14 @@ void deleteARecord() {
 	fflush(stdin);
 	scanf("%d", &itemID);
 
+	/* NULL CHECKER */
+    if(nullDetecter(itemID) == 0) {
+        printf("\nError : ItemID < %d > was deleted! Please retry another ItemID later ...\n", atoi(itemID));
+        Sleep(3000);
+        goto INPUT;
+    }
 	deleteLine = ((itemID - 1000) * 12) + 1;
 	deleteLine++;
-
 	printf("\nIs that < ID = %d > that you need to delete ? ( Y / N ) : ", itemID);
 	fflush(stdin);
 	scanf("%c", &choice);
@@ -1054,6 +1129,8 @@ void deleteARecord() {
 	if(choice != 'Y' && choice != 'y') {
         goto INPUT;
 	}
+
+	logData(itemID ,3);
 
 	char space[] = "----NULL----";
 
@@ -1245,6 +1322,21 @@ void startup() {
     fclose(IDR);
     printf("\n System: (IDR) Configuration Successful Loaded\n");
     Sleep(500);
+
+    /*Check "system\\record.log"*/
+    FILE *LOG = fopen("system\\record.log", "r+");
+    if(LOG == NULL) {
+        LOG = fopen("system\\record.log", "a");
+        if(LOG == NULL) {
+            return failure();
+        }
+        putw(1000, LOG);
+        fclose(LOG);
+    }
+    fclose(LOG);
+    printf("\n Logs: (RCL) File Successful Loaded\n");
+    Sleep(500);
+
 }
 
 void getConfig() {
