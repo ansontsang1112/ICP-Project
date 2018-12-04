@@ -45,7 +45,7 @@ int main()
                 j++;
                 if(j == line_num && j == line_num + 1 && j == line_num + 2 && j == line_num + 3 && j == line_num + 4 && j == line_num + 5 && j == line_num + 6 && j == line_num + 7 && j == line_num + 8 && j == line_num + 9)
                 {	printf("%s\n", str);}
-            }
+            }}
 
 	
 	/* Tell user which function they can use */
