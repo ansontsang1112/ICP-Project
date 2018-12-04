@@ -75,7 +75,7 @@ char username[50], password[50];
 void ini() {
     printf(" *** Welcome to HKUSPACE Inventory Management and Record System ***\n\n");
     printf("\t***    1819S1    ***\n\n");
-    printf("*** This system is developed by CCIT4020 Class No. ?L-?? Group No,?? ***\n\n");
+    printf("*** This system is developed by CCIT4020 Class No. CL-03 Group No,6 ***\n\n");
 }
 
 void au_ini() {
@@ -259,6 +259,7 @@ void CustomerPanel() {
 void choices(int type) {
     switch (type) {
     	case 0:
+    	    logData(-1000, -2);
         	printf("\nYou have selected Logout, Exiting Session ...\n");
         	Sleep(3000);
         	printf("\nThankyou for using HKUSPACE IMRS ^v^");
@@ -930,7 +931,9 @@ void buyanitem() {
 void logData(int itemID, int modType) {
     char logFile[] = "system\\record.log";
     FILE *logIO = fopen(logFile, (((DataCheck() == 0) ? "w+" : "a+")));
-    if(modType == -1) {
+    if(modType == -2) {
+        fprintf(logIO, "\n[%s] [%s] : User, < %s > have Logged out HKUSpace IRMS.", __DATE__, __TIME__, username);
+    } if(modType == -1) {
         fprintf(logIO, "\n[%s] [%s] : User, < %s > have Logged in HKUSpace IRMS.", __DATE__, __TIME__, username);
     } if(modType == 0) {
         fprintf(logIO, "\n[%s] [%s] : User, < %s > have added a record. (Item Number = %d)", __DATE__, __TIME__, username, itemID);
@@ -951,6 +954,7 @@ void logData(int itemID, int modType) {
     } if(modType == 8) {
         fprintf(logIO, "\n[%s] [%s] : User, < %s > have buy / transfer an Item. (Item Number = %d).", __DATE__, __TIME__, username, itemID);
     }
+    fclose(logIO);
 };
 
 int nullDetecter(int itemID) {
