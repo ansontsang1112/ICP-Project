@@ -1,14 +1,14 @@
 ---Start of Record (1000)---
-Record ID: 1000
-Item Name: Apple Watch
-Item ID: 1000
-Prices: 3500.000000
-Catagory: Electronic_Devices
-Quantity: 1
-Weight: 0.500 Kg
-Recipient: Storage
-Final Destination: HK
-Delivery Status: Storage
+----NULL----
+----NULL----
+----NULL----
+----NULL----
+----NULL----
+----NULL----
+----NULL----
+----NULL----
+----NULL----
+----NULL----
 --- End of Record (1000)---
 ---Start of Record (1001)---
 Record ID: 1001

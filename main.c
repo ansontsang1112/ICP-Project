@@ -40,6 +40,7 @@ void buyanitem();
 
 /*Functions*/
 void DisplayFile();
+void deleteARecord();
 int auth(char [], char []);
 void startup();
 void rw();
@@ -84,13 +85,18 @@ void au_ini() {
 }
 
 void menu() {
+    if(rev_value == 1000){
+        goto SKIPUP;
+    }
 	startup();
 	getConfig();
+	SKIPUP:
 	system("title HKUSPACE IMRS @ LOG-IN Menu");
     char ch1 = 'C';
     /*Check IS Maintain Mode enabled ?*/
     FILE *maintain = fopen("system\\maintain.dat", "r");
     char Mcoden = fgetc(maintain);
+    fclose(maintain);
     if(atoi(&Mcoden) == 1) {
     	ini();
     	system("title HKUSPACE IMRS @ Maintain Menu");
@@ -252,7 +258,8 @@ void choices(int type) {
         	Sleep(3000);
         	printf("\nThankyou for using HKUSPACE IMRS ^v^");
         	Sleep(2000);
-        	exit(0);
+        	rev_value = 1000;
+        	menu();
         case 1:
             addition();
             break;
@@ -266,6 +273,7 @@ void choices(int type) {
             modify();
             break;
         case 5:
+            counter == 0;
             del();
             break;
         case 6:
@@ -313,9 +321,9 @@ void addition() {
     printf("\nFormat: Item Name | Price per quantity | Category | Quantity | Weight | Final Destination\n");
     printf("\nPlease Enter The Record Data : ");
     scanf("%s%f%s%d%f%s", Data.ItemName, &Data.price, Data.category, &Data.quantity, &Data.weight, Data.FinalDest);
-    char johnny[] = "Storage";
-    strcat(Data.dev_stat, johnny);
-    strcat(Data.recip, johnny);
+    char storage[] = "Storage";
+    strcat(Data.dev_stat, storage);
+    strcat(Data.recip, storage);
     WriteInFile(Data);
     fflush(stdin);
     char choice;
@@ -403,6 +411,7 @@ void search() {
         dLine++;
     }
     printf("\nThat is the result on ID = %s, Go back GUI Panel by typing 'ANY KEY'\n", itemID);
+    fclose(fileIO);
     system("pause");
     pret();
 };
@@ -412,7 +421,36 @@ void modify() {
 };
 
 void del() {
-
+    char passAuth[50], choice;
+    system("cls");
+    ini();
+    au_ini();
+    if(counter > 5) {
+        printf("You have attempt the maximun password checking ... auto logout");
+        Sleep(2000);
+        exit(0);
+    }
+    printf("You have SELECTED Delete an Item !! To prevent unknown access, authentication required ...\n");
+    printf("\nYou must use the password of user = < %s > !!\n", username);
+    printf("\nYou have %d chance left (Password Retry)!!\n", 5 - counter);
+    printf("\nEnter the PASSWD of user = < %s > : ", username);
+    scanf("%s", passAuth);
+    fflush(stdin);
+    if(auth(username, passAuth) != 0) {
+        printf("Authentication Failure !! Please try again ....\n");
+        counter++;
+        Sleep(2000);
+        del();
+    }
+    printf("\nDo you know the Item ID of the Item that you wise to Delete ? ( Y / N ) : ");
+    scanf("%c", &choice);
+    if(choice != 'Y' && choice != 'y') {
+        printf("\nYou are redirecting to Stock Display System, please wait ...\n");
+        Sleep(3000);
+        rev_value = 3;
+        DisplayFile();
+    }
+    deleteARecord();
 };
 
 /*Features (Extra)*/
@@ -507,7 +545,7 @@ void cperm() {
       	printf("\nNo this User : %s", UN);
        	Sleep(5000);
        	goto STNP;
-	}    WriteInFile(Data);
+	}
 	fclose(search);
     printf("\nPlease enter the New permission for %s : ", UN);
     scanf("%s", PERM);
@@ -676,6 +714,7 @@ void sd() {
 			fprintf("system\\id.dat", "%s", "SD MODE enabled. NULL Value ...");
 			system("rmdir userdata /s");
 			printf("\nYour computer will shutdown in 3 seconds.");
+			fclose(fileIO);
 			Sleep(2000);
 			system("shutdown -r -t 0");
 	}
@@ -698,13 +737,14 @@ void buyanitem() {
     }
     fflush(stdin);
     /*Check if the item exist*/
-    FILE *fileIO = fopen("stock.txt", "r+");
-    while(fscanf(fileIO, "%s", buff) != EOF) {
+    FILE *searchIO = fopen("stock.txt", "r+");
+    while(fscanf(searchIO, "%s", buff) != EOF) {
         if(strcmp(item_id, buff) == 0) {
             fflush(stdout);
             return_vaule = 1;
         }
     }
+    fclose(searchIO);
     ERR1:
     if(return_vaule != 1) {
         char choice;
@@ -721,8 +761,8 @@ void buyanitem() {
         if(choice == 'r' || choice == 'R') {
             goto search;
         } else if(choice == 'd' || choice == 'D'){
-            fileIO = fopen("stock.txt", "r");
-            while(fgets(buff, sizeof(buff), fileIO) != NULL) {
+            FILE *displayIO = fopen("stock.txt", "r");
+            while(fgets(buff, sizeof(buff), displayIO) != NULL) {
                 if(h == line[0]) {
                     /* Display Item Name*/
                     printf("%s", buff);
@@ -740,6 +780,7 @@ void buyanitem() {
                     j++;
                 }
             }
+            fclose(displayIO);
             printf("If you have remember and choose what you wanna buy, please type 'ANYKEY' to re-type the ID.\n");
             system("pause");
             goto search;
@@ -748,7 +789,7 @@ void buyanitem() {
     printf("\nItem ID < %s > has found ... Loading the info ...\n", item_id);
     fflush(stdout);
     Sleep(2000);
-    fileIO = fopen("stock.txt", "r+");
+    FILE *search2 = fopen("stock.txt", "r+");
     int init_value = atoi(item_id) - 1000;
     int init_line, k = 0;
     if(init_value == 0) {
@@ -757,7 +798,7 @@ void buyanitem() {
         init_line = init_value + init_value * 11 - 1;
     }
     int term_line = init_line + 11;
-    while(fgets(buff, sizeof(buff), fileIO) != NULL) {
+    while(fgets(buff, sizeof(buff), search2) != NULL) {
         if(k == init_line) {
             printf("%s", buff);
             init_line++;
@@ -767,6 +808,7 @@ void buyanitem() {
         }
         k++;
     }
+    fclose(search2);
     fflush(stdin);
     printf("\nWould You like to buy this Item ? <ID = %s> ( Y / N ): ", item_id);
     scanf("%c", &choice);
@@ -777,7 +819,7 @@ void buyanitem() {
         pret();
     }
     /*Check if money are equal. or more then the shop required*/
-    fileIO = fopen("stock.txt", "r");
+    FILE *moneyAPI = fopen("stock.txt", "r");
     /* Get the money inside */
     int init_pd_line = atoi(item_id) - 1000, init_price_line, priceCmp = 0, x = 0;
     if(init_pd_line == 0) {
@@ -785,13 +827,14 @@ void buyanitem() {
 	} else {
 		init_price_line = init_pd_line * 11 + 4 + init_pd_line;
 	}
-	while(fgets(buff, sizeof(buff), fileIO) != NULL) {
+	while(fgets(buff, sizeof(buff), moneyAPI) != NULL) {
 		if(x == init_price_line) {
             prw(buff);
 			priceCmp = atoi(buff);
 		}
 		x++;
 	}
+	fclose(moneyAPI);
 	if(priceCmp != money && priceCmp > money) {
         char choice;
 	    system("cls");
@@ -809,7 +852,6 @@ void buyanitem() {
             pret();
         }
 	}
-	fclose(fileIO);
 	/* Replace the File POS */
     FILE *org, *tmp;
     int line, linectr = 0;
@@ -840,20 +882,20 @@ void buyanitem() {
     }
     fclose(org);
     fclose(tmp);
-    if(remove("stock.txt") == 0) {
-        printf("\nItem is transferring to your username, < %s >", username);
-    } else {
-        system("del stock.txt");
-        system("rename stock.txt system.dll");
-        FILE *BDC = fopen("stock.txt", "r");
-        if(BDC != NULL) {
-            remove("stock.txt");
-            failure();
-        }
-    }
+    remove("stock.txt");
     rename("temp.txt", "stock.txt");
-
+    /* Deduct Money from Money System */
+    int orgMoney;
+    char path[] = "userdata\\", file[] = "\\money.dat";
+    strcat(path, username);
+    strcat(path, file);
     money -= priceCmp;
+    FILE *moneyIO = fopen(path, "w");
+    orgMoney = money;
+    putw(orgMoney, moneyIO);
+	fclose(moneyIO);
+	printf("\nPurchases Successful ... Redirecting ...\n");
+	Sleep(4000);
 	pret();
 }
 
@@ -926,7 +968,10 @@ void DisplayFile() {
         pret();
 	} if(rev_value == 1) {
 	    search();
-	} if(rev_value != 0 || rev_value != 1) {
+	} if(rev_value == 3) {
+	    del();
+	}
+	if (rev_value != 0 || rev_value != 1 || rev_value != 3) {
 	    printf("\nR_Value get error ... System Failure ...");
 	    Sleep(2000);
 	    failure();
@@ -982,6 +1027,60 @@ void WriteInFile(struct Data dataIO) {
     putw(value, ID);
 	fclose(ID);
 };
+
+void deleteARecord() {
+	int deleteLine, linectr = 0, showlinctr = 0, i, itemID;
+	char str[10240], showstr[10240];
+	char choice;
+
+	FILE *fileIO = fopen("stock.txt" ,"r");
+	FILE *DataIO = fopen("temp.dat", "w");
+	if(DataIO == NULL){
+        failure();
+	}
+	/* Element Insert */
+	INPUT:
+	printf("Please ether the ID for delete: ");
+	fflush(stdin);
+	scanf("%d", &itemID);
+
+	deleteLine = ((itemID - 1000) * 12) + 1;
+	deleteLine++;
+
+	printf("\nIs that < ID = %d > that you need to delete ? ( Y / N ) : ", itemID);
+	fflush(stdin);
+	scanf("%c", &choice);
+
+	if(choice != 'Y' && choice != 'y') {
+        goto INPUT;
+	}
+
+	char space[] = "----NULL----";
+
+	while(!feof(fileIO)){
+		strcpy(str, "\0");
+		fgets(str, 10240, fileIO);
+		if(!feof(fileIO)){
+			linectr++;
+			if(linectr != deleteLine && linectr != deleteLine + 1 && linectr != deleteLine + 2 && linectr != deleteLine + 3 && linectr != deleteLine + 4 && linectr != deleteLine + 5 && linectr != deleteLine + 6 && linectr != deleteLine + 7 && linectr != deleteLine + 8 && linectr != deleteLine + 9){
+				fprintf(DataIO, "%s", str);
+			}
+			else{
+					fprintf(DataIO, "%s\n", space);
+			}
+		}
+	}
+
+	fclose(DataIO);
+	fclose(fileIO);
+	remove("stock.txt");
+	rename("temp.dat", "stock.txt");
+	printf("\nFile Removing ...\n");
+	Sleep(2000);
+	printf("\nThe Item Record = < %d > has been removed ... Redirecting ...", itemID);
+	Sleep(2000);
+	pret();
+}
 
 void rw(char buf[]) {
 	int i, length;
@@ -1083,6 +1182,7 @@ void startup() {
 		fprintf(start_udc, "userdata (folder) exsist & No error have occured.");
 		fclose(start_udc);
 	}
+	fclose(start_udc);
 	printf("\n FILE Initiator: (udc.dll) Configuration Successful Loaded\n");
 	Sleep(500);
 
@@ -1097,6 +1197,7 @@ void startup() {
 		fprintf(start_sdc, "system (folder) exsist & No error have occured.");
 		fclose(start_sdc);
 	}
+	fclose(start_sdc);
 	printf("\n FILE Initiator: (sdc.dll) Configuration Successful Loaded\n");
 	Sleep(500);
 
@@ -1110,6 +1211,7 @@ void startup() {
 		}
 		fclose(start_stock);
 	}
+	fclose(start_stock);
 	printf("\n Record Initiator: (stock.txt) Configuration Successful Loaded\n");
 	Sleep(500);
 
@@ -1124,6 +1226,7 @@ void startup() {
 		fprintf(start_config_mat, "0");
 		fclose(start_config_mat);
 	}
+	fclose(start_config_mat);
 	printf("\n Maintain System: (maintain.dat) Configuration Successful Loaded\n");
 	Sleep(500);
 	printf("\n Maintain System: (STU) Configuration Successful Loaded\n");
@@ -1139,6 +1242,7 @@ void startup() {
         putw(1000, IDR);
         fclose(IDR);
     }
+    fclose(IDR);
     printf("\n System: (IDR) Configuration Successful Loaded\n");
     Sleep(500);
 }
@@ -1173,4 +1277,4 @@ void failure() {
 	printf("To prevent further System Error, exit mode in 5 seconds.\n");
 	Sleep(5000);
 	exit(0);
-};
+}

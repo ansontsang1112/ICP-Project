@@ -42,7 +42,19 @@ Prices: 500.000000
 Catagory: Fruit
 Quantity: 50
 Weight: 8.000 Kg
-Recipient: root
+Recipient: Storage
 Final Destination: HK
 Delivery Status: Storage
 --- End of Record (1003)---
+---Start of Record (1004)---
+Record ID: 1004
+Item Name: 
+Item ID: 1004
+Prices: 0.000000
+Catagory: 
+Quantity: 0
+Weight: 0.000 Kg
+Recipient: 
+Final Destination: 
+Delivery Status: 
+--- End of Record (1004)---
