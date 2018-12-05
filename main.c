@@ -34,6 +34,7 @@ void cperm();
 void emm();
 void sd();
 void buyanitem();
+void viewLogFile();
 
 /*Functions*/
 void logData(int, int);
@@ -180,6 +181,7 @@ void menu() {
 
 /*Main Function*/
 int main(int argc, char **argv){
+    viewLogFile();
 	menu();
 }
 
@@ -201,7 +203,9 @@ void SysPanel() {
     printf(" 7. Change Permission of Specific Users\n");
     printf(" 8. Enable / Disable Maintain Mode\n");
     printf(" 9. Enable Self Destruction Mode\n");
-    printf("\n What is your option <1-10> ? || ");
+    printf("10. Buy / Transfer Item form market\n");
+    printf("11. View Logs in Log File\n");
+    printf("\n What is your option <1-11> ? || ");
     scanf("%d", &choice);
     choices(choice);
 };
@@ -220,11 +224,12 @@ void SAPanel() {
     printf(" 4. Modify Item Information<s>\n");
     printf(" 5. Delete Item Record<s>\n");
     printf(" 6. Change Users Password\n");
-    printf("\n What is your option <0-6> ? || ");
+    printf("11. View Logs in Log File\n");
+    printf("\n What is your option <0-6, 11> ? || ");
     fflush(stdin);
     scanf("%d", &choice);
-    if(choice > 6) {
-    	printf("\nYou are only allow to enter 0 - 6, %d are not allowed !", choice);
+    if(choice > 6 && choice < 11) {
+    	printf("\nYou are only allow to enter 0 - 6 / 11, %d are not allowed !", choice);
     	Sleep(2000);
     	return SAPanel();
 	}
@@ -293,6 +298,8 @@ void choices(int type) {
             break;
         case 10:
         	buyanitem();
+        case 11:
+            viewLogFile();
         default:
             printf("No this option < %d >, < 1 - 10> Only.\n", type);
             Sleep(3000);
@@ -312,6 +319,7 @@ void choices(int type) {
 /*Features (Original)*/
 void addition() {
     system("cls");
+    system("title HKUSPACE IMRS @ Stock Addition Mode");
     ini();
     au_ini();
     printf("\n>> You have enter the Additional Mode\n\n");
@@ -372,6 +380,7 @@ void display() {
 
 void search() {
     system("cls");
+    system("title HKUSPACE IMRS @ Stock Searching Mode");
     char pcid, itemID[20], buff[10240];
     int maxLoop = 12, dLine = 0, line[maxLoop], loop = 0, i = 0, return_vaule = -1;
     ini();
@@ -444,6 +453,7 @@ void search() {
 };
 
 void modify() {
+    system("title HKUSPACE IMRS @ Stock Modifing Mode");
     int modValue = 0, return_vaule = -1;
     char str[102400], buff[102400], choice, itemID[20], infoChanges[1024], aChoice;
     system("cls");
@@ -535,6 +545,7 @@ void modify() {
 };
 
 void del() {
+    system("title HKUSPACE IMRS @ Stock Deleting Mode");
     char passAuth[50], choice;
     system("cls");
     ini();
@@ -569,6 +580,7 @@ void del() {
 
 /*Features (Extra)*/
 void cpwd() {
+    system("title HKUSPACE IMRS @ Password Administartion Center");
 	system("cls");
 	ini();
 	char PW[10], NPWD[10], CNP[10];
@@ -624,6 +636,7 @@ void cpwd() {
 };
 
 void cperm() {
+    system("title HKUSPACE IMRS @ Permission Management Center");
     char PERM[10], PW[20], IUN[20];
     system("cls");
     ini();
@@ -678,7 +691,7 @@ void cperm() {
 
 void emm() {
 	system("cls");
-    system("title Note @ Maintain Mode (EMM) Selecting");
+    system("title HKUSPACE IMRS @ Maintain Mode (EMM)");
     char choice = 'N', mc;
     int index = 1, rev_index = 0;
     FILE *extract_mc = fopen("system\\maintain.dat", "r");
@@ -690,7 +703,7 @@ void emm() {
         switch(choice) {
             case 'Y':
             case 'y':
-                system("title Note @ Maintain Mode (EMM) Enabling");
+                system("title HKUSPACE IMRS @ Maintain Mode (EMM) Enabling");
                 FILE *maintain = fopen("system\\maintain.dat", "w");
                 fprintf(maintain, "%d", index);
                 fclose(maintain);
@@ -712,6 +725,7 @@ void emm() {
     } else {
     	MDS:
     	printf("");
+    	system("title HKUSPACE IMRS @ Maintain Mode (EMM) Disable Auth.");
     	char auth_un[10], auth_pw[10];
     	system("cls");
     	ini();
@@ -751,6 +765,7 @@ void emm() {
 
     	/*Start to close MMODE*/
     	off:
+        system("title HKUSPACE IMRS @ Maintain Mode (EMM) Disable Auth.");
     	fflush(stdin);
         printf("\nAre you sure to closed Maintain Mode (Y/N) : ");
         scanf("%c", &choice);
@@ -839,6 +854,7 @@ void sd() {
 };
 
 void buyanitem() {
+    system("title HKUSPACE IMRS @ Market System");
     /*Var*/
     char buff[102400], *data_cmp, item_id[20], choice;
     search:
@@ -1024,6 +1040,50 @@ void buyanitem() {
 	printf("\nPurchases Successful ... Redirecting ...\n");
 	Sleep(4000);
 	pret();
+}
+
+void viewLogFile() {
+    char choice, buff[102400], confirm;
+    system("cls");
+    system("title HKUSPACE IMRS @ Log Check");
+    ini();
+    au_ini();
+    printf("Are you sure to check the log files ? ( Y / N ) : ");
+    scanf("%c", &choice);
+    fflush(stdin);
+    if(choice != 'Y' && choice != 'y') {
+        char choice2;
+        fflush(stdin);
+        printf("\nWould you like to try again ? ( Y / N ) : ");
+        scanf("%c", &choice2);
+        fflush(stdin);
+        if(choice2 != 'Y' && choice2 != 'y') {
+            printf("Redireting : Panel");
+            Sleep(2000);
+            pret();
+        }
+        printf("\nPlease Wait ...\n");
+        Sleep(3000);
+        viewLogFile();
+    }
+    system("cls");
+    ini();
+    au_ini();
+    FILE *fileUX = fopen("system\\record.log", "r");
+    while(fgets(buff, sizeof(buff), fileUX) != NULL) {
+        printf("%s", buff);
+    }
+    fclose(fileUX);
+    printf("\n\nPlease type <k> to go back Panel ! : ");
+    scanf("%c", &confirm);
+    if(confirm != 'y' && confirm != 'y') {
+        printf("\nBack to Panel ... Bye");
+        Sleep(3000);
+        pret();
+    };
+    printf("\nLoading back to Panel ... Please wait ...");
+    Sleep(3000);
+    pret();
 }
 
 /*Functions*/
@@ -1229,6 +1289,7 @@ int DataCheck() {
     if(fgets(TPI, sizeof(TPI), DCT) != NULL) {
         return_value = 1;
     }
+    fclose(DCT);
     return return_value;
 };
 
@@ -1244,9 +1305,9 @@ void WriteInFile(struct Data dataIO) {
     /*ID Get F(x)*/
     FILE *IDRE = fopen("system\\id.dat", "r");
     value = getw(IDRE);
+    fclose(IDRE);
 
 	FILE *WriteIn = fopen("stock.txt", (((DataCheck() == 0) ? "w+" : "a+")));
-
 	float finalPrice = Data.price * Data.quantity;
 	float actualWeight = Data.weight * Data.quantity;
     /* ---- WriteIn Started ----*/
@@ -1297,8 +1358,10 @@ void deleteARecord() {
         if(strcmp(itemID, buff) == 0) {
             fflush(stdout);
             return_value = 0;
+            fclose(searchUX);
         }
     }
+    fclose(searchUX);
 
     if(return_value != 0) {
         printf("\nItem ID : %s is not exist ... redirecting", itemIOCheckID);
@@ -1560,10 +1623,10 @@ void getConfig() {
 	fclose(extract_mcg);
 	system("title HKUSPACE IMRS @ Initialising");
 	printf("\n The System are keep loading, please wait .... \n");
-	Sleep(1000);
+	Sleep(500);
 	system("title HKUSPACE IMRS @ Successfully loaded");
 	printf("\n HKUSAPCE Inventory Management and Record System is Sucessfully Loaded");
-	Sleep(1000);
+	Sleep(500);
 	system("cls");
 };
 

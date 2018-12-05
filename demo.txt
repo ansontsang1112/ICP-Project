@@ -1,6 +1,6 @@
 ---Start of Record (1000)---
 Record ID: 1000
-Item Name: Apple Watch 2.0
+Item Name: Apple Watch
 Item ID: 1000
 Prices: 7000.00
 Catagory: Electronic_Devices
