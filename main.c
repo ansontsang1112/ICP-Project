@@ -181,7 +181,6 @@ void menu() {
 
 /*Main Function*/
 int main(int argc, char **argv){
-    viewLogFile();
 	menu();
 }
 
@@ -251,7 +250,10 @@ void CustomerPanel() {
     printf(" 6. Change Users Password\n");
     printf("10. Buy / Transfer Item form market\n");
     printf("\n What is your option <0-6> ? || ");
-
+    fflush(stdin);
+    scanf("%d", &choice);
+    choices(choice);
+    fflush(stdin);
 };
 
 void choices(int type) {
