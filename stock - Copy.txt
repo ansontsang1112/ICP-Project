@@ -71,16 +71,16 @@ Final Destination: US
 Delivery Status: Storage
 --- End of Record (1005)---
 ---Start of Record (1006)---
-----NULL----
-----NULL----
-----NULL----
-----NULL----
-----NULL----
-----NULL----
-----NULL----
-----NULL----
-----NULL----
-----NULL----
+Record ID: 1006
+Item Name: Tea
+Item ID: 1006
+Prices: 1000.00
+Catagory: Drinks
+Quantity: 20
+Weight: 6.00 Kg
+Recipient: Storage
+Final Destination: HK
+Delivery Status: Storage
 --- End of Record (1006)---
 ---Start of Record (1007)---
 Record ID: 1007

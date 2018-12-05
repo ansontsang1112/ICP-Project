@@ -42,7 +42,83 @@
 [Dec  5 2018] [13:25:13] : User, < will > have Logged in HKUSpace IRMS.
 [Dec  5 2018] [13:25:46] : HKUSpace IMRS Successfully Loaded at 13:25:46.
 [Dec  5 2018] [13:25:46] : User, < will > have Logged in HKUSpace IRMS.
-[Dec  5 2018] [14:01:23] : HKUSpace IMRS Successfully Loaded at 14:01:23.
-[Dec  5 2018] [14:01:47] : HKUSpace IMRS Successfully Loaded at 14:01:47.
-[Dec  5 2018] [14:03:17] : HKUSpace IMRS Successfully Loaded at 14:03:17.
-[Dec  5 2018] [14:03:43] : HKUSpace IMRS Successfully Loaded at 14:03:43.
+[Dec  5 2018] [13:38:59] : HKUSpace IMRS Successfully Loaded at 13:38:59.
+[Dec  5 2018] [13:38:59] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [13:38:59] : User, < will > have Logged out HKUSpace IRMS.
+[Dec  5 2018] [13:38:59] : User, < roo > failure to Log in HKUSpace IRMS.
+[Dec  5 2018] [13:38:59] : User, < root > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [13:53:31] : HKUSpace IMRS Successfully Loaded at 13:53:31.
+[Dec  5 2018] [13:53:31] : User, < root > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [13:53:31] : User, < root > have added a record. (Item Number = 1006)
+[Dec  5 2018] [13:53:31] : HKUSpace IMRS Successfully Loaded at 13:53:31.
+[Dec  5 2018] [13:53:31] : User, < root > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [13:53:31] : User, < root > have Logged out HKUSpace IRMS.
+[Dec  5 2018] [13:53:31] : User, < roo > failure to Log in HKUSpace IRMS.
+[Dec  5 2018] [13:53:31] : User, < root > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [13:53:31] : User, < root > have added a record. (Item Number = 1007)
+[Dec  5 2018] [13:53:31] : User, < root > have added a record. (Item Number = 1008)
+[Dec  5 2018] [13:53:31] : HKUSpace IMRS Successfully Loaded at 13:53:31.
+[Dec  5 2018] [13:53:31] : User, < root > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [13:53:31] : User, < root > have searched record. (Item Number = 1008)
+[Dec  5 2018] [13:53:31] : User, < root > have modify an Item. (Item Number = 1000).
+[Dec  5 2018] [13:53:31] : User, < root > have displayed all records
+[Dec  5 2018] [13:53:31] : HKUSpace IMRS Successfully Loaded at 13:53:31.
+[Dec  5 2018] [13:53:31] : User, < root > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:16:41] : HKUSpace IMRS Successfully Loaded at 14:16:41.
+[Dec  5 2018] [14:16:41] : User, < root > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:16:41] : User, < root > have deleted record. (Item Number = 1006)
+[Dec  5 2018] [14:19:05] : HKUSpace IMRS Successfully Loaded at 14:19:05.
+[Dec  5 2018] [14:19:05] : User, < root > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:19:05] : User, < root > have deleted record. (Item Number = 1006)
+[Dec  5 2018] [14:19:05] : User, < root > have enabled maintain mode.
+[Dec  5 2018] [14:19:05] : HKUSpace IMRS Successfully Loaded at 14:19:05.
+[Dec  5 2018] [14:20:46] : HKUSpace IMRS Successfully Loaded at 14:20:46.
+[Dec  5 2018] [14:20:46] : User, <  > have disabled maintain mode.
+[Dec  5 2018] [14:20:46] : HKUSpace IMRS Successfully Loaded at 14:20:46.
+[Dec  5 2018] [14:20:46] : User, < root > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:21:32] : HKUSpace IMRS Successfully Loaded at 14:21:32.
+[Dec  5 2018] [14:21:32] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:24:05] : HKUSpace IMRS Successfully Loaded at 14:24:05.
+[Dec  5 2018] [14:24:05] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:24:05] : User, < will > have displayed all records
+[Dec  5 2018] [14:25:27] : HKUSpace IMRS Successfully Loaded at 14:25:27.
+[Dec  5 2018] [14:25:27] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:27:37] : HKUSpace IMRS Successfully Loaded at 14:27:37.
+[Dec  5 2018] [14:27:37] : User, < root > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:28:39] : HKUSpace IMRS Successfully Loaded at 14:28:39.
+[Dec  5 2018] [14:28:39] : User, < root > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:30:26] : HKUSpace IMRS Successfully Loaded at 14:30:26.
+[Dec  5 2018] [14:30:26] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:30:26] : User, < will > have searched record. (Item Number = 1007)
+[Dec  5 2018] [14:30:26] : User, < will > have searched record. (Item Number = 1005)
+[Dec  5 2018] [14:45:25] : HKUSpace IMRS Successfully Loaded at 14:45:25.
+[Dec  5 2018] [14:45:25] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:48:48] : HKUSpace IMRS Successfully Loaded at 14:48:48.
+[Dec  5 2018] [14:48:48] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:50:26] : HKUSpace IMRS Successfully Loaded at 14:50:26.
+[Dec  5 2018] [14:50:26] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:50:26] : User, < will > have searched record. (Item Number = 1005)
+[Dec  5 2018] [14:53:05] : HKUSpace IMRS Successfully Loaded at 14:53:05.
+[Dec  5 2018] [14:53:05] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:53:05] : User, < will > have buy / transfer an Item. (Item Number = 1005).
+[Dec  5 2018] [14:53:05] : User, < will > have searched record. (Item Number = 1005)
+[Dec  5 2018] [14:55:50] : HKUSpace IMRS Successfully Loaded at 14:55:50.
+[Dec  5 2018] [14:55:50] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:55:50] : User, < will > have buy / transfer an Item. (Item Number = 1005).
+[Dec  5 2018] [14:55:50] : User, < will > have searched record. (Item Number = 1005)
+[Dec  5 2018] [14:57:05] : HKUSpace IMRS Successfully Loaded at 14:57:05.
+[Dec  5 2018] [14:57:05] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:57:05] : User, < will > have buy / transfer an Item. (Item Number = 1000).
+[Dec  5 2018] [14:57:05] : HKUSpace IMRS Successfully Loaded at 14:57:05.
+[Dec  5 2018] [14:57:05] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:57:05] : User, < will > have buy / transfer an Item. (Item Number = 1005).
+[Dec  5 2018] [14:59:35] : HKUSpace IMRS Successfully Loaded at 14:59:35.
+[Dec  5 2018] [14:59:35] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [14:59:35] : User, < will > have buy / transfer an Item. (Item Number = 1000).
+[Dec  5 2018] [15:00:51] : HKUSpace IMRS Successfully Loaded at 15:00:51.
+[Dec  5 2018] [15:00:51] : User, < root > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [15:00:51] : HKUSpace IMRS Successfully Loaded at 15:00:51.
+[Dec  5 2018] [15:00:51] : User, < will > have Logged in HKUSpace IRMS.
+[Dec  5 2018] [15:00:51] : User, < will > have Logged out HKUSpace IRMS.
+[Dec  5 2018] [15:00:51] : HKUSpace IMRS Successfully Loaded at 15:00:51.
+[Dec  5 2018] [15:00:51] : User, < root > have Logged in HKUSpace IRMS.

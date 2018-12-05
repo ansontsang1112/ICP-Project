@@ -242,16 +242,18 @@ void CustomerPanel() {
     ini();
     au_ini();
     printf(" 0. Logout\n");
-    printf(" 1. Add New Item<s>\n");
     printf(" 2. Display Item Record<s>\n");
     printf(" 3. Search Item Information<s>\n");
-    printf(" 4. Modify Item Information<s>\n");
-    printf(" 5. Delete Item Record<s>\n");
     printf(" 6. Change Users Password\n");
     printf("10. Buy / Transfer Item form market\n");
-    printf("\n What is your option <0-6> ? || ");
+    printf("\n What is your option <0, 2, 3, 6, 10> ? || ");
     fflush(stdin);
     scanf("%d", &choice);
+    if(choice != 0 && choice != 2 && choice != 3 && choice != 6 && choice != 10) {
+        printf("\nYou do not have enought permission to do that!\n");
+        Sleep(3000);
+        CustomerPanel();
+    }
     choices(choice);
     fflush(stdin);
 };
@@ -881,12 +883,12 @@ void buyanitem() {
             return_vaule = 1;
         }
     }
-    if(nullDetecter(atoi(item_id) == 0)) {
+    fclose(searchIO);
+    if(nullDetecter(atoi(item_id)) == 0) {
         printf("\nError : ItemID < %s > was deleted! Please retry another ItemID later ...\n", item_id);
         Sleep(3000);
         goto EnterID;
     }
-    fclose(searchIO);
     ERR1:
     if(return_vaule != 1) {
         char choice;
@@ -897,6 +899,7 @@ void buyanitem() {
         au_ini();
         printf("We cannot find your inserted Item ID, Would you like to retry or display all the Items ? ");
         printf("\n\nPlease enter your choice (r = retry / d = display) : ");
+        fflush(stdin);
         scanf("%c", &choice);
         printf("\n");
         fflush(stdin);
@@ -1051,6 +1054,7 @@ void viewLogFile() {
     ini();
     au_ini();
     printf("Are you sure to check the log files ? ( Y / N ) : ");
+    fflush(stdin);
     scanf("%c", &choice);
     fflush(stdin);
     if(choice != 'Y' && choice != 'y') {
@@ -1076,6 +1080,7 @@ void viewLogFile() {
         printf("%s", buff);
     }
     fclose(fileUX);
+    fflush(stdin);
     printf("\n\nPlease type <k> to go back Panel ! : ");
     scanf("%c", &confirm);
     if(confirm != 'y' && confirm != 'y') {
@@ -1132,7 +1137,8 @@ void logData(int itemID, int modType) {
 int nullDetecter(int itemID) {
     char str[102400], rec[102400], nullPointer[] = "----NULL----";
     int line = 0;
-    int cRoot = itemID - 1000, finalValue = cRoot * 11 + cRoot + 1; /* Check IF Line + 2 contain ----NULL---- */
+    int cRoot = itemID - 1000;
+    int finalValue = cRoot * 11 + cRoot + 2; /* Check IF Line + 2 contain ----NULL---- */
     FILE *fileIO = fopen("stock.txt", "r+");
     while(fgets(str, sizeof(str), fileIO) != NULL) {
         if(line == finalValue) {
@@ -1350,14 +1356,14 @@ void deleteARecord() {
 	}
 	/* Element Insert */
 	INPUT:
-	printf("Please ether the ID for delete: ");
+	printf("\nPlease ether the ID for delete: ");
 	fflush(stdin);
 	scanf("%s", itemIOCheckID);
 
 	/* Check if the Item Exist */
     FILE *searchUX = fopen("stock.txt", "r+");
     while(fscanf(searchUX, "%s", buff) != EOF) {
-        if(strcmp(itemID, buff) == 0) {
+        if(strcmp(itemIOCheckID, buff) == 0) {
             fflush(stdout);
             return_value = 0;
             fclose(searchUX);
@@ -1369,6 +1375,8 @@ void deleteARecord() {
         printf("\nItem ID : %s is not exist ... redirecting", itemIOCheckID);
         Sleep(3000);
         deleteARecord();
+        fclose(DataIO);
+	    fclose(fileIO);
     }
 
     itemID = atoi(itemIOCheckID);
@@ -1496,7 +1504,6 @@ void pret() {
 }
 
 void startup() {
-	system("COLOR A");
 	char err = 0, d1[50], d2[50], PATH[] = "\\userdata", SPATH[] = "\\system";
 	/*Check "userdata"*/
 	getcwd(d1, sizeof(d1));
@@ -1631,7 +1638,6 @@ void getConfig() {
 	printf("\n HKUSAPCE Inventory Management and Record System is Sucessfully Loaded");
 	Sleep(500);
 	system("cls");
-	system("COLOR 7");
 };
 
 void failure() {
