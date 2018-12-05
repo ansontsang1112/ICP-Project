@@ -1496,6 +1496,7 @@ void pret() {
 }
 
 void startup() {
+	system("COLOR A");
 	char err = 0, d1[50], d2[50], PATH[] = "\\userdata", SPATH[] = "\\system";
 	/*Check "userdata"*/
 	getcwd(d1, sizeof(d1));
@@ -1630,6 +1631,7 @@ void getConfig() {
 	printf("\n HKUSAPCE Inventory Management and Record System is Sucessfully Loaded");
 	Sleep(500);
 	system("cls");
+	system("COLOR 7");
 };
 
 void failure() {
